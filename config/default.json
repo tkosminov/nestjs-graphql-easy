@@ -1,0 +1,40 @@
+{
+  "APP_SETTINGS": {
+    "port": 8080,
+    "wssPort": 8081,
+    "wssUseRedis": true,
+    "wssPingInterval": 3000,
+    "wssPingTimeout": 10000,
+    "bodyLimit": "50mb",
+    "bodyParameterLimit": 50000
+  },
+  "DB_SETTINGS": {
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "nestjs_gql_example",
+    "logging": "all",
+    "synchronize": true
+  },
+  "CORS_SETTINGS": {
+    "allowedOrigins": [],
+    "allowedUrls": [],
+    "allowedMethods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "allowedCredentials": false,
+    "allowedHeaders": []
+  },
+  "GRAPHQL_SETTINGS": {
+    "playground": true,
+    "debug": true,
+    "introspection": true,
+    "installSubscriptionHandlers": true
+  }
+}
