@@ -1,10 +1,10 @@
 {
-  "name": "nestjs-gql-example",
+  "name": "nestjs-graphql-template",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "t.kosminov",
+  "license": "MIT",
   "private": true,
-  "license": "UNLICENSED",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
