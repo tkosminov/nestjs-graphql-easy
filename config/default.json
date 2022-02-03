@@ -2,18 +2,23 @@
   "APP_SETTINGS": {
     "port": 8080,
     "wssPort": 8081,
-    "wssUseRedis": true,
     "wssPingInterval": 3000,
     "wssPingTimeout": 10000,
     "bodyLimit": "50mb",
     "bodyParameterLimit": 50000
+  },
+  "LOGGER_SETTINGS": {
+    "level": "info",
+    "silence": [
+      "healthz"
+    ]
   },
   "DB_SETTINGS": {
     "host": "localhost",
     "port": 5432,
     "username": "postgres",
     "password": "postgres",
-    "database": "nestjs_gql_example",
+    "database": "nestjs_graphql_template",
     "logging": "all",
     "synchronize": true
   },

@@ -3,7 +3,7 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 import config from 'config';
 import { Request } from 'express';
 
-import { corsNotAllowed } from './errors';
+import { cors_not_allowed } from './errors';
 import { getOrigin, getPath } from './helpers/req.helper';
 
 const corsSettings = config.get<ICorsSettings>('CORS_SETTINGS');
@@ -37,7 +37,7 @@ export const corsOptionsDelegate: unknown = (
     error = null;
   } else {
     corsOptions.origin = false;
-    error = corsNotAllowed({ raise: false });
+    error = cors_not_allowed({ raise: false });
   }
 
   callback(error, corsOptions);

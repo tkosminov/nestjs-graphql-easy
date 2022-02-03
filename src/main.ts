@@ -24,8 +24,8 @@ async function bootstrap() {
 
   app.use(
     urlencoded({
-      limit: appSettings.bodyLimit,
       extended: true,
+      limit: appSettings.bodyLimit,
       parameterLimit: appSettings.bodyParameterLimit,
     }),
   );

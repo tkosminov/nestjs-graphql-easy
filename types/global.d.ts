@@ -9,7 +9,6 @@ interface ICorsSettings {
 interface IAppSettings {
   readonly port: number;
   readonly wssPort: number;
-  readonly wssUseRedis: boolean;
   readonly wssPingInterval: number;
   readonly wssPingTimeout: number;
   readonly bodyLimit: string;
@@ -21,4 +20,9 @@ interface IGraphqlSettings {
   readonly debug: boolean;
   readonly introspection: boolean;
   readonly installSubscriptionHandlers: boolean;
+}
+
+interface ILogSettings {
+  readonly level: string;
+  readonly silence: string[];
 }

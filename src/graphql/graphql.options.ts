@@ -7,6 +7,7 @@ import config from 'config';
 import { Request } from 'express';
 
 import { corsOptionsDelegate } from '../cors.options';
+import { LoggerStore } from '../logger/logger.store';
 
 const appSettings = config.get<IAppSettings>('APP_SETTINGS');
 const graphqlSettings = config.get<IGraphqlSettings>('GRAPHQL_SETTINGS');
@@ -20,7 +21,10 @@ export class GraphqlOptions implements GqlOptionsFactory {
       formatError: (err: GraphQLError) => {
         return err;
       },
-      context: ({ req }: { req: Request }) => ({ req }),
+      context: ({ req }: { req: Request & { logger_store: LoggerStore } }) => ({
+        req,
+        logger_store: req.logger_store,
+      }),
       cors: corsOptionsDelegate,
       bodyParserConfig: {
         limit: appSettings.bodyLimit,
