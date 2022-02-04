@@ -2,6 +2,7 @@ import Dataloader from 'dataloader';
 import { getRepository } from 'typeorm';
 
 import { reduceToObject } from '../../helpers/array.helper';
+
 import { ILoaderData } from './decorator.loader';
 
 export const manyToOneLoader = (selected_fields: Set<string>, data: ILoaderData) => {

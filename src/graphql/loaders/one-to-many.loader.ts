@@ -1,8 +1,8 @@
 import Dataloader from 'dataloader';
 import { getRepository } from 'typeorm';
-import { singular } from 'pluralize';
 
 import { groupBy } from '../../helpers/array.helper';
+
 import { ILoaderData } from './decorator.loader';
 
 export const oneToManyLoader = (selected_fields: Set<string>, data: ILoaderData) => {
