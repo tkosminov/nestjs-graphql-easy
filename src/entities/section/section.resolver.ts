@@ -1,4 +1,4 @@
-import { Args, Context, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { Section } from './section.entity';
 import { SectionService } from './section.service';
@@ -30,7 +30,7 @@ export class SectionResolver {
       relation_fk: 'book_id',
     })
     _rpe: any,
-    @Context() ctx: any
+    @Context() ctx: GraphQLExecutionContext
   ): Promise<Book> {
     return await ctx['book'].load(section.book_id);
   }

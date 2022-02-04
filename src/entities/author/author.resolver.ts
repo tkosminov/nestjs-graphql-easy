@@ -1,4 +1,4 @@
-import { Args, Context, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { Author } from './author.entity';
 import { AuthorService } from './author.service';
@@ -37,7 +37,7 @@ export class AuthorResolver {
       relation_fk: 'author_id',
     })
     _rpe: any,
-    @Context() ctx: any
+    @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
     return await ctx['books'].load(author.id);
   }
