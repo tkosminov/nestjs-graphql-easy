@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { GraphQLExecutionContext } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import { getRepository } from 'typeorm';
-import { singular, isSingular } from 'pluralize';
 import {
   FragmentDefinitionNode,
   GraphQLResolveInfo,
@@ -15,117 +10,92 @@ import {
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
 
-import { EntityHelper } from '../../entities/helper/entity.helper';
+export enum ELoaderType {
+  MANY_TO_ONE = 'MANY_TO_ONE',
+  ONE_TO_MANY = 'ONE_TO_MANY',
+  ONE_TO_ONE = 'ONE_TO_ONE',
+  POLYMORPHIC = 'POLYMORPHIC'
+}
 
-export const Loader = createParamDecorator(
-  (data: any, ctx: ExecutionContext) => {
-    // const [root, args, gctx, info] = ctx.getArgs();
-    const args = ctx.getArgs();
-    const gctx: GraphQLExecutionContext = args[2];
-    const info: GraphQLResolveInfo = args[3];
+export interface ILoaderData {
+  loader_type: ELoaderType,
+  field_name: string;
+  relation_table: string;
+  relation_fk: string;
+}
 
-    if (data.prototype instanceof EntityHelper) {
-      return getRepository(data).find({});
-    } else if (typeof data === 'string') {
-      const fields = Array.from(
-        resolverRecursive(info.fieldNodes, data, info.fragments),
-      ).map((field) => data + '.' + field);
+export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {
+  // const [root, args, gctx, info] = ctx.getArgs();
+  const args = ctx.getArgs();
 
-      gctx[data] = manyToOneLoader(fields, data);
-    } else {
-      const entityName: string = data[0];
-      const entityKey: string = data[1];
+  const gctx: GraphQLExecutionContext = args[2];
+  const info: GraphQLResolveInfo = args[3];
 
-      if (!gctx[entityName]) {
-        const fields = Array.from(
-          resolverRecursive(info.fieldNodes, entityName, info.fragments),
-        ).map((field) => singular(entityName) + '.' + field);
+  if (!gctx[data.field_name]) {
+    const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
 
-        gctx[entityName] = oneToManyLoader(fields, entityName, entityKey);
-      }
+    switch (data.loader_type) {
+      case ELoaderType.MANY_TO_ONE:
+        gctx[data.field_name] = manyToOneLoader(selected_fields, data)
+        break;
+      case ELoaderType.ONE_TO_MANY:
+        gctx[data.field_name] = oneToManyLoader(selected_fields, data)
+        break;
+      case ELoaderType.ONE_TO_ONE:
+        break;
+      case ELoaderType.POLYMORPHIC:
+        break;
+      default:
+        break;
     }
-
-    return gctx;
-  },
-);
-
-function resolverRecursive(
-  resolvers: ReadonlyArray<SelectionNode>,
-  field: string,
-  fragments: { [key: string]: FragmentDefinitionNode },
-  from_fragment = false,
-): Set<string> {
-  let results = new Set(['id']);
-
-  if (from_fragment) {
-    for (const resolver of resolvers) {
-      if (resolver.kind === 'Field' && !resolver.selectionSet) {
-        results.add(resolver.name.value);
-      } else if (resolver.kind === 'FragmentSpread') {
-        const fragment = fragments[resolver.name.value];
-
-        if (fragment?.selectionSet) {
-          results = new Set([
-            ...results,
-            ...resolverRecursive(
-              fragment.selectionSet.selections,
-              field,
-              fragments,
-              true,
-            ),
-          ]);
-        }
-      }
-    }
-
-    return results;
   }
 
-  for (const resolver of resolvers) {
-    if (resolver.kind === 'Field' && resolver.selectionSet) {
-      if (resolver.name.value === field) {
-        resolver.selectionSet.selections.forEach((item) => {
-          if (item.kind === 'Field' && !item.selectionSet) {
-            results.add(item.name.value);
-          } else if (item.kind === 'Field' && item.selectionSet) {
-            if (isSingular(item.name.value)) {
-              results.add(item.name.value + '_id');
-            }
-          } else if (item.kind === 'FragmentSpread') {
-            const fragment = fragments[item.name.value];
+  return gctx;
+});
 
-            if (fragment?.selectionSet) {
-              results = new Set([
-                ...results,
-                ...resolverRecursive(
-                  fragment.selectionSet.selections,
-                  field,
-                  fragments,
-                  true,
-                ),
-              ]);
-            }
-          } else if (item.kind === 'InlineFragment' && item.selectionSet) {
+function recursiveSelectedFields(
+  data: ILoaderData,
+  selectionNodes: ReadonlyArray<SelectionNode>,
+  fragments: Record<string, FragmentDefinitionNode>,
+) {
+  let results: Set<string> = new Set([]);
+
+  for (const node of selectionNodes) {
+    if (node.kind === 'Field' && node.selectionSet && data.field_name === node.name.value) {
+      for (const selection of node.selectionSet.selections) {
+        if (selection.kind === 'Field' && !selection.selectionSet) {
+          results.add(selection.name.value);
+        } else if (selection.kind === 'FragmentSpread') {
+          const fragment = fragments[selection.name.value]
+
+          if (fragment.selectionSet) {
             results = new Set([
               ...results,
-              ...resolverRecursive(
-                item.selectionSet.selections,
-                field,
-                fragments,
-                true,
-              ),
-            ]);
+              ...recursiveSelectedFields(data, fragment.selectionSet.selections, fragments)
+            ])
           }
-        });
+        } else if (selection.kind === 'InlineFragment' && selection.selectionSet) {
+          results = new Set([
+            ...results,
+            ...recursiveSelectedFields(data, selection.selectionSet.selections, fragments)
+          ])
+        }
+      } 
+    } else if (node.kind === 'Field' && !node.selectionSet) {
+      results.add(node.name.value);
+    } else if (node.kind === 'InlineFragment' && node.selectionSet) {
+      results = new Set([
+        ...results,
+        ...recursiveSelectedFields(data, node.selectionSet.selections, fragments)
+      ])
+    } else if (node.kind === 'FragmentSpread') {
+      const fragment = fragments[node.name.value];
 
-        return results;
-      } else {
-        return resolverRecursive(
-          resolver.selectionSet.selections,
-          field,
-          fragments,
-          false,
-        );
+      if (fragment.selectionSet) {
+        results = new Set([
+          ...results,
+          ...recursiveSelectedFields(data, fragment.selectionSet.selections, fragments)
+        ])
       }
     }
   }

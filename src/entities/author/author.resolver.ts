@@ -11,7 +11,7 @@ import {
 import { Author } from './author.entity';
 import { AuthorService } from './author.service';
 
-import { Loader } from '../../graphql/loaders/decorator.loader';
+import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
 import { Book } from '../book/book.entity';
 
 @Resolver(() => Author)
@@ -19,8 +19,8 @@ export class AuthorResolver {
   constructor(private readonly authorService: AuthorService) {}
 
   @Query(() => [Author])
-  public async authors(@Loader(Author) loader: any) {
-    return await loader;
+  public async authors() {
+    return await this.authorService.findAll();
   }
 
   @Query(() => Author)
@@ -31,7 +31,12 @@ export class AuthorResolver {
   @ResolveField()
   public async books(
     @Parent() author: Author,
-    @Loader(['books', 'author_id']) _rpe: any,
+    @Loader({
+      loader_type: ELoaderType.ONE_TO_MANY,
+      field_name: 'books',
+      relation_table: 'book',
+      relation_fk: 'author_id'
+    }) _rpe: any,
     @Context() ctx: any,
   ): Promise<Book[]> {
     return await ctx['books'].load(author.id);
