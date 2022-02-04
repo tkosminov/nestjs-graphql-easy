@@ -50,7 +50,7 @@ const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnT
   let col_type: any = String;
 
   if (column.options?.type) {
-    if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean'].includes(column.options.type['name'])) {
+    if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean', 'Date'].includes(column.options.type['name'])) {
       col_type = column.options.type;
     } else if (typeof column.options.type === 'string') {
       switch (column.options.type) {
@@ -125,7 +125,7 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   typeorm_metadata.columns
     .filter((col) => {
-      return [table_name, 'EntityHelper'].includes(col.target['name']);
+      return [table_name].includes(col.target['name']);
     })
     .forEach((col) => {
       if (!(col.options?.type && typeof col.options.type === 'string' && ['json', 'jsonb'].includes(col.options.type))) {
