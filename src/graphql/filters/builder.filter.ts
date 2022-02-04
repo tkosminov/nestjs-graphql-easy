@@ -1,4 +1,4 @@
-import { ID, InputType, Field, FieldOptions, ReturnTypeFunc, Int, Float } from '@nestjs/graphql';
+import { ID, InputType, Field, FieldOptions, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
 import { getMetadataArgsStorage } from 'typeorm';
 import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
@@ -33,11 +33,11 @@ const field_input_types: Map<string, ReturnTypeFunc> = new Map();
 
 // const common_types = [ID, Int, Float, Boolean, String, Date]
 
-const decorateField = (clazz: any, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
-  clazz.prototype[field_name] = Field(field_type, {
+const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
+  fn.prototype[field_name] = Field(field_type, {
     ...field_options,
     nullable: true,
-  })(clazz.prototype, field_name);
+  })(fn.prototype, field_name);
 };
 
 const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnTypeFunc => {
@@ -47,7 +47,7 @@ const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnT
     return field_input_types.get(name);
   }
 
-  let col_type: any = String;
+  let col_type: GqlTypeReference = String;
 
   if (column.options?.type) {
     if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean', 'Date'].includes(column.options.type['name'])) {

@@ -49,7 +49,11 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   return gctx;
 });
 
-function recursiveSelectedFields(data: ILoaderData, selectionNodes: ReadonlyArray<SelectionNode>, fragments: Record<string, FragmentDefinitionNode>) {
+function recursiveSelectedFields(
+  data: ILoaderData,
+  selectionNodes: ReadonlyArray<SelectionNode>,
+  fragments: Record<string, FragmentDefinitionNode>
+) {
   let results: Set<string> = new Set([]);
 
   for (const node of selectionNodes) {
