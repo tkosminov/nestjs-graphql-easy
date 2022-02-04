@@ -1,13 +1,7 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
-import { IsString } from 'class-validator';
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { IsNumber, IsString } from 'class-validator';
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Book } from '../book/book.entity';
 import { EntityHelper } from '../helper/entity.helper';

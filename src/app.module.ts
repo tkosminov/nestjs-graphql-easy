@@ -8,13 +8,7 @@ import { LoggerModule } from './logger/logger.module';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 
 @Module({
-  imports: [
-    LoggerModule,
-    HealthzModule,
-    DatabaseModule,
-    GraphQLModule,
-    EntitiesModule,
-  ],
+  imports: [LoggerModule, HealthzModule, DatabaseModule, GraphQLModule, EntitiesModule],
   controllers: [],
   providers: [],
 })

@@ -11,10 +11,7 @@ export function getOrmConfig(): TypeOrmModuleOptions {
     ormConfig = {
       type: 'postgres',
       host: process.env.DB_HOST || settings.host,
-      port:
-        (process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : null) ||
-        settings.port ||
-        5432,
+      port: (process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : null) || settings.port || 5432,
       username: process.env.DB_USERNAME || settings.username,
       password: process.env.DB_PASSWORD || settings.password,
       database: `${process.env.NODE_ENV}_${settings.database}`,

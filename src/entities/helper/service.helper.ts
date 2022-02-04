@@ -1,12 +1,4 @@
-import {
-  DeepPartial,
-  FindConditions,
-  FindManyOptions,
-  FindOneOptions,
-  RemoveOptions,
-  Repository,
-  SaveOptions,
-} from 'typeorm';
+import { DeepPartial, FindConditions, FindManyOptions, FindOneOptions, RemoveOptions, Repository, SaveOptions } from 'typeorm';
 
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
@@ -40,11 +32,7 @@ export class ServiceHelper<T> {
     return await this.save(result, options);
   }
 
-  public async update(
-    id: id,
-    partial: QueryDeepPartialEntity<T>,
-    options: FindOneOptions<T> = {},
-  ) {
+  public async update(id: id, partial: QueryDeepPartialEntity<T>, options: FindOneOptions<T> = {}) {
     await this.repository.update(id, partial);
 
     return await this.findOne(id, options);

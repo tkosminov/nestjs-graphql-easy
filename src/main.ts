@@ -27,13 +27,13 @@ async function bootstrap() {
       extended: true,
       limit: appSettings.bodyLimit,
       parameterLimit: appSettings.bodyParameterLimit,
-    }),
+    })
   );
 
   app.use(
     helmet({
       contentSecurityPolicy: false,
-    }),
+    })
   );
 
   app.use(cookieParser());
@@ -43,7 +43,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-    }),
+    })
   );
 
   await app.listen(appSettings.port);

@@ -1,15 +1,7 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 
 import { IsString, IsUUID } from 'class-validator';
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { EntityHelper } from '../helper/entity.helper';
 import { Author } from '../author/author.entity';

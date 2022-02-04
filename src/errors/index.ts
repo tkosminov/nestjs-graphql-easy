@@ -11,7 +11,7 @@ export const authorization_failed = (data?: IErrData) => {
       status: 400,
       error: data?.msg || 'AUTHORIZATION_FAILED',
     },
-    400,
+    400
   );
 
   if (data?.raise) {
@@ -27,7 +27,7 @@ export const unauthorized = (data?: IErrData) => {
       status: 401,
       error: data?.msg || 'UNAUTHORIZED',
     },
-    401,
+    401
   );
 
   if (data?.raise) {
@@ -43,7 +43,7 @@ export const bad_request = (data?: IErrData) => {
       status: 400,
       error: data?.msg || 'BAD_REQUEST',
     },
-    400,
+    400
   );
 
   if (data?.raise) {
@@ -59,7 +59,7 @@ export const cors_not_allowed = (data?: IErrData) => {
       status: 400,
       error: data?.msg || 'CORS_NOT_ALLOWED',
     },
-    400,
+    400
   );
 
   if (data?.raise) {
@@ -75,7 +75,7 @@ export const access_denied = (data?: IErrData) => {
       status: 403,
       error: data?.msg || 'ACCESS_DENIED',
     },
-    403,
+    403
   );
 
   if (data?.raise) {
@@ -91,7 +91,7 @@ export const not_found = (data?: IErrData) => {
       status: 404,
       error: data?.msg || 'NOT_FOUND',
     },
-    404,
+    404
   );
 
   if (data?.raise) {
@@ -107,7 +107,7 @@ export const internal_server_error = (data?: IErrData) => {
       status: 500,
       error: data?.msg || 'INTERNAL_SERVER_ERROR',
     },
-    500,
+    500
   );
 
   if (data?.raise) {
@@ -123,7 +123,7 @@ export const service_unavailable = (data?: IErrData) => {
       status: 503,
       error: data?.msg || 'SERVICE_UNAVAILABLE',
     },
-    503,
+    503
   );
 
   if (data?.raise) {
