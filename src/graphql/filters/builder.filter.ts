@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+
 import { ID, InputType, Field, FieldOptions, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
 import { getMetadataArgsStorage } from 'typeorm';
@@ -18,15 +20,20 @@ export enum EOperationQuery {
   NULL = 'IS NULL',
   NOT_NULL = 'IS NOT NULL',
   IN = 'IN',
-  // ILIKE = 'ILIKE',
-  // NOT_ILIKE = 'NOT ILIKE',
-  // BETWEEN = 'BETWEEN',
-  // NOT_BETWEEN = 'NOT BETWEEN',
-  // GT = '>',
-  // GTE = '>=',
-  // LT = '<',
-  // LTE = '<=',
+  ILIKE = 'ILIKE',
+  NOT_ILIKE = 'NOT_ILIKE',
+  GT = '>',
+  GTE = '>=',
+  LT = '<',
+  LTE = '<=',
 }
+
+const basic_operations = ['EQ', 'NOT_EQ', 'NULL', 'NOT_NULL', 'IN'];
+const string_operations = ['ILIKE', 'NOT_ILIKE'];
+const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
+
+const string_types: GqlTypeReference[] = [String];
+const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
 const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 const field_input_types: Map<string, ReturnTypeFunc> = new Map();
@@ -49,7 +56,7 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
   let col_type: GqlTypeReference = String;
 
   if (fk_columns.get(column.target['name'])?.has(column.propertyName)) {
-    col_type = ID
+    col_type = ID;
   } else if (column.options?.type) {
     if (column.options.primary) {
       col_type = ID;
@@ -82,7 +89,7 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
 
   const field_input_type = function fieldInputType() {};
 
-  Object.keys(EOperationQuery).forEach((operation) => {
+  basic_operations.forEach((operation) => {
     switch (EOperationQuery[operation]) {
       case EOperationQuery.NULL:
       case EOperationQuery.NOT_NULL:
@@ -102,6 +109,22 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
         break;
     }
   });
+
+  if (string_types.includes(col_type)) {
+    string_operations.forEach((operation) => {
+      decorateField(field_input_type, operation, () => col_type, {
+        nullable: true,
+      });
+    });
+  }
+
+  if (precision_types.includes(col_type)) {
+    precision_operations.forEach((operation) => {
+      decorateField(field_input_type, operation, () => col_type, {
+        nullable: true,
+      });
+    });
+  }
 
   Object.defineProperty(field_input_type, 'name', {
     value: `${name}FilterInputType`,
@@ -126,16 +149,15 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
   const typeorm_metadata = getMetadataArgsStorage();
 
   if (!fk_columns.size) {
-    typeorm_metadata.joinColumns
-      .forEach((col) => {
-        const table = col.target['name'];
-  
-        if (!fk_columns.has(table)) {
-          fk_columns.set(table, new Set([col.name]));
-        } else {
-          fk_columns.get(table).add(col.name);
-        }
-      });
+    typeorm_metadata.joinColumns.forEach((col) => {
+      const table = col.target['name'];
+
+      if (!fk_columns.has(table)) {
+        fk_columns.set(table, new Set([col.name]));
+      } else {
+        fk_columns.get(table).add(col.name);
+      }
+    });
   }
 
   typeorm_metadata.columns
