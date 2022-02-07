@@ -37,8 +37,13 @@ export class AuthorResolver {
       relation_fk: 'author_id',
     })
     _rpe: any,
+    @Filter({
+      relation_table: 'book',
+    })
+    _rpf: any,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
+    console.log(_rpf);
     return await ctx['books'].load(author.id);
   }
 }

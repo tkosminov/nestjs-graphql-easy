@@ -30,6 +30,7 @@ export enum EOperationQuery {
 
 const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 const field_input_types: Map<string, ReturnTypeFunc> = new Map();
+const fk_columns: Map<string, Set<string>> = new Map();
 
 // const common_types = [ID, Int, Float, Boolean, String, Date]
 
@@ -49,8 +50,12 @@ const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnT
 
   let col_type: GqlTypeReference = String;
 
-  if (column.options?.type) {
-    if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean', 'Date'].includes(column.options.type['name'])) {
+  if (fk_columns.get(column.target['name'])?.has(column.propertyName)) {
+    col_type = ID
+  } else if (column.options?.type) {
+    if (column.options.primary) {
+      col_type = ID;
+    } else if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean', 'Date'].includes(column.options.type['name'])) {
       col_type = column.options.type;
     } else if (typeof column.options.type === 'string') {
       switch (column.options.type) {
@@ -72,9 +77,6 @@ const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnT
         case 'bool':
         case 'boolean':
           col_type = Boolean;
-          break;
-        default:
-          col_type = String;
           break;
       }
     }
@@ -122,6 +124,17 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
   const where_input_type = function whereInputType() {};
 
   const typeorm_metadata = getMetadataArgsStorage();
+
+  typeorm_metadata.joinColumns
+    .forEach((col) => {
+      const table = col.target['name'];
+
+      if (!fk_columns.has(table)) {
+        fk_columns.set(table, new Set([col.name]));
+      } else {
+        fk_columns.get(table).add(col.name);
+      }
+    });
 
   typeorm_metadata.columns
     .filter((col) => {
