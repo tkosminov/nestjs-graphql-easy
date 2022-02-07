@@ -20,6 +20,7 @@ export enum EOperationQuery {
   NULL = 'IS NULL',
   NOT_NULL = 'IS NOT NULL',
   IN = 'IN',
+  NOT_IN = 'NOT IN',
   ILIKE = 'ILIKE',
   NOT_ILIKE = 'NOT_ILIKE',
   GT = '>',
@@ -28,7 +29,7 @@ export enum EOperationQuery {
   LTE = '<=',
 }
 
-const basic_operations = ['EQ', 'NOT_EQ', 'NULL', 'NOT_NULL', 'IN'];
+const basic_operations = ['EQ', 'NOT_EQ', 'NULL', 'NOT_NULL', 'IN', 'NOT_IN'];
 const string_operations = ['ILIKE', 'NOT_ILIKE'];
 const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 
@@ -98,6 +99,7 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
         });
         break;
       case EOperationQuery.IN:
+      case EOperationQuery.NOT_IN:
         decorateField(field_input_type, operation, () => [col_type], {
           nullable: true,
         });
