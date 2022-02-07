@@ -125,16 +125,18 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   const typeorm_metadata = getMetadataArgsStorage();
 
-  typeorm_metadata.joinColumns
-    .forEach((col) => {
-      const table = col.target['name'];
-
-      if (!fk_columns.has(table)) {
-        fk_columns.set(table, new Set([col.name]));
-      } else {
-        fk_columns.get(table).add(col.name);
-      }
-    });
+  if (!fk_columns.size) {
+    typeorm_metadata.joinColumns
+      .forEach((col) => {
+        const table = col.target['name'];
+  
+        if (!fk_columns.has(table)) {
+          fk_columns.set(table, new Set([col.name]));
+        } else {
+          fk_columns.get(table).add(col.name);
+        }
+      });
+  }
 
   typeorm_metadata.columns
     .filter((col) => {
