@@ -32,8 +32,6 @@ const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 const field_input_types: Map<string, ReturnTypeFunc> = new Map();
 const fk_columns: Map<string, Set<string>> = new Map();
 
-// const common_types = [ID, Int, Float, Boolean, String, Date]
-
 const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
   fn.prototype[field_name] = Field(field_type, {
     ...field_options,
@@ -41,8 +39,8 @@ const decorateField = (fn: () => void, field_name: string, field_type: ReturnTyp
   })(fn.prototype, field_name);
 };
 
-const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnTypeFunc => {
-  const name = `${column.propertyName}_${relation_table}`;
+const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
+  const name = `${column.propertyName}_${column.target['name']}`;
 
   if (field_input_types.has(name)) {
     return field_input_types.get(name);
@@ -111,6 +109,8 @@ const buildField = (relation_table: string, column: ColumnMetadataArgs): ReturnT
 
   InputType()(field_input_type);
 
+  field_input_types.set(name, () => field_input_type);
+
   return () => field_input_type;
 };
 
@@ -138,11 +138,11 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   typeorm_metadata.columns
     .filter((col) => {
-      return [table_name].includes(col.target['name']);
+      return [table_name, 'EntityHelper'].includes(col.target['name']);
     })
     .forEach((col) => {
       if (!(col.options?.type && typeof col.options.type === 'string' && ['json', 'jsonb'].includes(col.options.type))) {
-        decorateField(where_input_type, col.propertyName, buildField(table_name, col));
+        decorateField(where_input_type, col.propertyName, buildField(col));
       }
     });
 
