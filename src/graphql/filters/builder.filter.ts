@@ -29,7 +29,7 @@ export enum EOperationQuery {
   LTE = '<=',
 }
 
-const basic_operations = ['EQ', 'NOT_EQ', 'NULL', 'NOT_NULL', 'IN', 'NOT_IN'];
+const basic_operations = ['EQ', 'NOT_EQ', 'NULL', 'IN', 'NOT_IN'];
 const string_operations = ['ILIKE', 'NOT_ILIKE'];
 const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 

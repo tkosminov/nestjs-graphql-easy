@@ -5,7 +5,8 @@ import { AuthorService } from './author.service';
 
 import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
 import { Book } from '../book/book.entity';
-import { Filter } from 'src/graphql/filters/decorator.filter';
+import { Filter } from '../../graphql/filters/decorator.filter';
+import { parseFilter } from '../../graphql/filters/parser.filter';
 
 @Resolver(() => Author)
 export class AuthorResolver {
@@ -18,7 +19,8 @@ export class AuthorResolver {
     })
     _rpf: any
   ) {
-    console.log(_rpf);
+    const res = parseFilter('author', _rpf);
+    console.log(JSON.stringify(res))
     return await this.authorService.findAll();
   }
 
@@ -37,13 +39,8 @@ export class AuthorResolver {
       relation_fk: 'author_id',
     })
     _rpe: any,
-    @Filter({
-      relation_table: 'book',
-    })
-    _rpf: any,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
-    console.log(_rpf);
     return await ctx['books'].load(author.id);
   }
 }
