@@ -3,6 +3,7 @@ import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField
 import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
 import { Book } from '../book/book.entity';
 import { Filter } from '../../graphql/filters/decorator.filter';
+import { Order } from '../../graphql/order/decorator.order';
 
 import { Author } from './author.entity';
 import { AuthorService } from './author.service';
@@ -24,6 +25,10 @@ export class AuthorResolver {
       relation_table: 'author',
     })
     _filter: unknown,
+    @Order({
+      relation_table: 'author',
+    })
+    _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
@@ -48,6 +53,10 @@ export class AuthorResolver {
       relation_table: 'book',
     })
     _filter: unknown,
+    @Order({
+      relation_table: 'book',
+    })
+    _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
     return await ctx[field_alias].load(author.id);

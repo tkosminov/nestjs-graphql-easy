@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 
-import { EOperatorQuery, EOperationQuery } from './builder.filter';
+import { EFilterOperator, EFilterOperation } from './builder.filter';
 
 export type IFilterValue = Record<string, unknown>;
 
@@ -16,13 +16,13 @@ function recursiveParseFilter(relation_table: string, data: IFilterValue, field?
   let params = {};
 
   Object.entries(data).forEach(([key, value], index) => {
-    if (key === EOperatorQuery.AND || key === EOperatorQuery.OR) {
-      let results = ` ${EOperatorQuery[key]} (`;
+    if (key === EFilterOperator.AND || key === EFilterOperator.OR) {
+      let results = ` ${EFilterOperator[key]} (`;
 
       (value as IFilterValue[]).forEach((v, i) => {
         const res = recursiveParseFilter(relation_table, v);
 
-        if (i > 0 && !v[EOperatorQuery.AND] && !v[EOperatorQuery.OR]) {
+        if (i > 0 && !v[EFilterOperator.AND] && !v[EFilterOperator.OR]) {
           results += ' AND ';
         }
 
@@ -41,39 +41,39 @@ function recursiveParseFilter(relation_table: string, data: IFilterValue, field?
         query += ' AND ';
       }
 
-      switch (EOperationQuery[key]) {
-        case EOperationQuery.EQ:
-        case EOperationQuery.NOT_EQ:
-        case EOperationQuery.GT:
-        case EOperationQuery.GTE:
-        case EOperationQuery.LT:
-        case EOperationQuery.LTE:
+      switch (EFilterOperation[key]) {
+        case EFilterOperation.EQ:
+        case EFilterOperation.NOT_EQ:
+        case EFilterOperation.GT:
+        case EFilterOperation.GTE:
+        case EFilterOperation.LT:
+        case EFilterOperation.LTE:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} :${param_key}`;
+          query += `${relation_table}.${field} ${EFilterOperation[key]} :${param_key}`;
           break;
-        case EOperationQuery.NULL:
+        case EFilterOperation.NULL:
           if (!!value) {
-            query += `${relation_table}.${field} ${EOperationQuery.NULL}`;
+            query += `${relation_table}.${field} ${EFilterOperation.NULL}`;
           } else {
-            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`;
+            query += `${relation_table}.${field} ${EFilterOperation.NOT_NULL}`;
           }
           break;
-        case EOperationQuery.NOT_NULL:
+        case EFilterOperation.NOT_NULL:
           if (!!value) {
-            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`;
+            query += `${relation_table}.${field} ${EFilterOperation.NOT_NULL}`;
           } else {
-            query += `${relation_table}.${field} ${EOperationQuery.NULL}`;
+            query += `${relation_table}.${field} ${EFilterOperation.NULL}`;
           }
           break;
-        case EOperationQuery.IN:
-        case EOperationQuery.NOT_IN:
+        case EFilterOperation.IN:
+        case EFilterOperation.NOT_IN:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} (:...${param_key})`;
+          query += `${relation_table}.${field} ${EFilterOperation[key]} (:...${param_key})`;
           break;
-        case EOperationQuery.ILIKE:
-        case EOperationQuery.NOT_ILIKE:
+        case EFilterOperation.ILIKE:
+        case EFilterOperation.NOT_ILIKE:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} '%' || :${param_key} || '%'`;
+          query += `${relation_table}.${field} ${EFilterOperation[key]} '%' || :${param_key} || '%'`;
           break;
       }
     } else {

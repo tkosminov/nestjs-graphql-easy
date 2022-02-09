@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import { ID, InputType, Field, FieldOptions, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
-
-import { getMetadataArgsStorage } from 'typeorm';
+import { ID, InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
 
 import { capitalize } from '../../helpers/string.helper';
+import { decorateField, where_field_input_types, fk_columns, parseColumns, table_columns, where_input_types } from '../store/store';
 
 import { IFilterData } from './decorator.filter';
 
-export enum EOperatorQuery {
+export enum EFilterOperator {
   AND = 'AND',
   OR = 'OR',
 }
 
-export enum EOperationQuery {
+export enum EFilterOperation {
   EQ = '=',
   NOT_EQ = '!=',
   NULL = 'IS NULL',
@@ -36,27 +35,10 @@ const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
-const where_input_types: Map<string, ReturnTypeFunc> = new Map();
-const field_input_types: Map<string, ReturnTypeFunc> = new Map();
-const fk_columns: Map<string, Set<string>> = new Map();
-
-const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
-  fn.prototype[field_name] = Field(field_type, {
-    ...field_options,
-    nullable: true,
-  })(fn.prototype, field_name);
-};
-
-const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
-  const name = `${column.propertyName}_${column.target['name']}`;
-
-  if (field_input_types.has(name)) {
-    return field_input_types.get(name);
-  }
-
+const buildFilterField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
   let col_type: GqlTypeReference = String;
 
-  if (fk_columns.get(column.target['name'])?.has(column.propertyName)) {
+  if (fk_columns.get(column.target['name'])?.has(column)) {
     col_type = ID;
   } else if (column.options?.type) {
     if (column.options.primary) {
@@ -88,18 +70,24 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
     }
   }
 
+  const name = `${col_type['name']}_FilterInputType`;
+
+  if (where_field_input_types.has(name)) {
+    return where_field_input_types.get(name);
+  }
+
   const field_input_type = function fieldInputType() {};
 
   basic_operations.forEach((operation) => {
-    switch (EOperationQuery[operation]) {
-      case EOperationQuery.NULL:
-      case EOperationQuery.NOT_NULL:
+    switch (EFilterOperation[operation]) {
+      case EFilterOperation.NULL:
+      case EFilterOperation.NOT_NULL:
         decorateField(field_input_type, operation, () => Boolean, {
           nullable: true,
         });
         break;
-      case EOperationQuery.IN:
-      case EOperationQuery.NOT_IN:
+      case EFilterOperation.IN:
+      case EFilterOperation.NOT_IN:
         decorateField(field_input_type, operation, () => [col_type], {
           nullable: true,
         });
@@ -129,17 +117,19 @@ const buildField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
   }
 
   Object.defineProperty(field_input_type, 'name', {
-    value: `${name}FilterInputType`,
+    value: name,
   });
 
   InputType()(field_input_type);
 
-  field_input_types.set(name, () => field_input_type);
+  where_field_input_types.set(name, () => field_input_type);
 
   return () => field_input_type;
 };
 
 export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
+  parseColumns()
+
   const table_name = capitalize(data.relation_table);
 
   if (where_input_types.has(table_name)) {
@@ -148,31 +138,11 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   const where_input_type = function whereInputType() {};
 
-  const typeorm_metadata = getMetadataArgsStorage();
+  table_columns.get(table_name).forEach((col) => {
+    decorateField(where_input_type, col.propertyName, buildFilterField(col));
+  })
 
-  if (!fk_columns.size) {
-    typeorm_metadata.joinColumns.forEach((col) => {
-      const table = col.target['name'];
-
-      if (!fk_columns.has(table)) {
-        fk_columns.set(table, new Set([col.name]));
-      } else {
-        fk_columns.get(table).add(col.name);
-      }
-    });
-  }
-
-  typeorm_metadata.columns
-    .filter((col) => {
-      return [table_name, 'EntityHelper'].includes(col.target['name']);
-    })
-    .forEach((col) => {
-      if (!(col.options?.type && typeof col.options.type === 'string' && ['json', 'jsonb'].includes(col.options.type))) {
-        decorateField(where_input_type, col.propertyName, buildField(col));
-      }
-    });
-
-  Object.values(EOperatorQuery).forEach((operator) => {
+  Object.values(EFilterOperator).forEach((operator) => {
     decorateField(where_input_type, operator, () => [where_input_type]);
   });
 
