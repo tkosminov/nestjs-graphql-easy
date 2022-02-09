@@ -3,14 +3,18 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
 
+import { IParsedFilter, parseFilter } from '../filters/parser.filter';
+
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
+import { manyLoader } from './many.loader';
 
 export enum ELoaderType {
   MANY_TO_ONE = 'MANY_TO_ONE',
   ONE_TO_MANY = 'ONE_TO_MANY',
   ONE_TO_ONE = 'ONE_TO_ONE',
   POLYMORPHIC = 'POLYMORPHIC',
+  MANY = 'MANY',
 }
 
 export interface ILoaderData {
@@ -24,22 +28,33 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   // const [root, args, gctx, info] = ctx.getArgs();
   const args = ctx.getArgs();
 
+  const gargs = args[1];
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
+
+  const filters = gargs['WHERE'];
+  let parsed_filters: IParsedFilter = null;
+
+  if (filters) {
+    parsed_filters = parseFilter(data.relation_table, filters);
+  }
 
   if (!gctx[data.field_name]) {
     const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
 
     switch (data.loader_type) {
       case ELoaderType.MANY_TO_ONE:
-        gctx[data.field_name] = manyToOneLoader(selected_fields, data);
+        gctx[data.field_name] = manyToOneLoader(selected_fields, data, parsed_filters);
         break;
       case ELoaderType.ONE_TO_MANY:
-        gctx[data.field_name] = oneToManyLoader(selected_fields, data);
+        gctx[data.field_name] = oneToManyLoader(selected_fields, data, parsed_filters);
         break;
       case ELoaderType.ONE_TO_ONE:
         break;
       case ELoaderType.POLYMORPHIC:
+        break;
+      case ELoaderType.MANY:
+        gctx[data.field_name] = manyLoader(selected_fields, data, parsed_filters);
         break;
       default:
         break;

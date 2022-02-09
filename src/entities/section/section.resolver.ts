@@ -1,18 +1,32 @@
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
+import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
+import { Filter } from '../../graphql/filters/decorator.filter';
+import { Book } from '../book/book.entity';
+
 import { Section } from './section.entity';
 import { SectionService } from './section.service';
-
-import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
-import { Book } from '../book/book.entity';
 
 @Resolver(() => Section)
 export class SectionResolver {
   constructor(private readonly sectionService: SectionService) {}
 
   @Query(() => [Section])
-  public async sections() {
-    return await this.sectionService.findAll();
+  public async sections(
+    @Loader({
+      loader_type: ELoaderType.MANY,
+      field_name: 'sections',
+      relation_table: 'section',
+      relation_fk: 'id',
+    })
+    _loader: unknown,
+    @Filter({
+      relation_table: 'section',
+    })
+    _filter: unknown,
+    @Context() ctx: GraphQLExecutionContext
+  ) {
+    return await ctx['sections'];
   }
 
   @Query(() => Section)
@@ -29,7 +43,11 @@ export class SectionResolver {
       relation_table: 'book',
       relation_fk: 'book_id',
     })
-    _rpe: any,
+    _loader: unknown,
+    @Filter({
+      relation_table: 'book',
+    })
+    _filter: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book> {
     return await ctx['book'].load(section.book_id);

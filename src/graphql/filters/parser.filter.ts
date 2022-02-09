@@ -1,11 +1,15 @@
 import { customAlphabet } from 'nanoid';
-import { getConnection } from 'typeorm';
 
 import { EOperatorQuery, EOperationQuery } from './builder.filter';
 
-type IFilterData = Record<string, unknown>
+type IFilterData = Record<string, unknown>;
 
-const nanoid = customAlphabet('1234567890abcdef', 10)
+export interface IParsedFilter {
+  query: string;
+  params: IFilterData;
+}
+
+const nanoid = customAlphabet('1234567890abcdef', 10);
 
 function recursiveParseFilter(relation_table: string, data: IFilterData, field?: string) {
   let query = '';
@@ -16,25 +20,25 @@ function recursiveParseFilter(relation_table: string, data: IFilterData, field?:
       let results = ` ${EOperatorQuery[key]} (`;
 
       (value as IFilterData[]).forEach((v, i) => {
-        const res = recursiveParseFilter(relation_table, v)
+        const res = recursiveParseFilter(relation_table, v);
 
         if (i > 0 && !v[EOperatorQuery.AND] && !v[EOperatorQuery.OR]) {
-          results += ' AND '
+          results += ' AND ';
         }
 
-        results += res.query
+        results += res.query;
 
-        params = { ...params, ...res.params }
-      })
+        params = { ...params, ...res.params };
+      });
 
-      results += ')'
+      results += ')';
 
-      query += results
+      query += results;
     } else if (field) {
       const param_key = nanoid();
 
       if (index > 0) {
-        query += ' AND '
+        query += ' AND ';
       }
 
       switch (EOperationQuery[key]) {
@@ -45,46 +49,48 @@ function recursiveParseFilter(relation_table: string, data: IFilterData, field?:
         case EOperationQuery.LT:
         case EOperationQuery.LTE:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} :${param_key}`
+          query += `${relation_table}.${field} ${EOperationQuery[key]} :${param_key}`;
           break;
         case EOperationQuery.NULL:
           if (!!value) {
-            query += `${relation_table}.${field} ${EOperationQuery.NULL}`
+            query += `${relation_table}.${field} ${EOperationQuery.NULL}`;
           } else {
-            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`
+            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`;
           }
           break;
         case EOperationQuery.NOT_NULL:
           if (!!value) {
-            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`
+            query += `${relation_table}.${field} ${EOperationQuery.NOT_NULL}`;
           } else {
-            query += `${relation_table}.${field} ${EOperationQuery.NULL}`
+            query += `${relation_table}.${field} ${EOperationQuery.NULL}`;
           }
           break;
         case EOperationQuery.IN:
         case EOperationQuery.NOT_IN:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} (:...${param_key})`
+          query += `${relation_table}.${field} ${EOperationQuery[key]} (:...${param_key})`;
           break;
         case EOperationQuery.ILIKE:
         case EOperationQuery.NOT_ILIKE:
           params[param_key] = value;
-          query += `${relation_table}.${field} ${EOperationQuery[key]} '%' || :${param_key} || '%'`
+          query += `${relation_table}.${field} ${EOperationQuery[key]} '%' || :${param_key} || '%'`;
           break;
       }
     } else {
-      const res = recursiveParseFilter(relation_table, value as IFilterData, key)
+      const res = recursiveParseFilter(relation_table, value as IFilterData, key);
 
-      query += res.query
-      params = { ...params, ...res.params }
+      if (index > 0) {
+        query += ' AND ';
+      }
+
+      query += res.query;
+      params = { ...params, ...res.params };
     }
-  })
+  });
 
   return { query, params };
 }
 
 export function parseFilter(relation_table: string, data: IFilterData) {
-  const { query, params } = recursiveParseFilter(relation_table, data);
-
-  return getConnection().driver.escapeQueryWithParameters(query, params, {})
+  return recursiveParseFilter(relation_table, data);
 }
