@@ -19,14 +19,14 @@ export class AuthorResolver {
       relation_table: 'author',
       relation_fk: 'id',
     })
-    _loader: unknown,
+    field_alias: string,
     @Filter({
       relation_table: 'author',
     })
     _filter: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
-    return await ctx['authors'];
+    return await ctx[field_alias];
   }
 
   @Query(() => Author)
@@ -43,13 +43,13 @@ export class AuthorResolver {
       relation_table: 'book',
       relation_fk: 'author_id',
     })
-    _loader: unknown,
+    field_alias: string,
     @Filter({
       relation_table: 'book',
     })
     _filter: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
-    return await ctx['books'].load(author.id);
+    return await ctx[field_alias].load(author.id);
   }
 }

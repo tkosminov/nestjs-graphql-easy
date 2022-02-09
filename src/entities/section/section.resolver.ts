@@ -19,14 +19,14 @@ export class SectionResolver {
       relation_table: 'section',
       relation_fk: 'id',
     })
-    _loader: unknown,
+    field_alias: string,
     @Filter({
       relation_table: 'section',
     })
     _filter: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
-    return await ctx['sections'];
+    return await ctx[field_alias];
   }
 
   @Query(() => Section)
@@ -43,13 +43,13 @@ export class SectionResolver {
       relation_table: 'book',
       relation_fk: 'book_id',
     })
-    _loader: unknown,
+    field_alias: string,
     @Filter({
       relation_table: 'book',
     })
     _filter: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book> {
-    return await ctx['book'].load(section.book_id);
+    return await ctx[field_alias].load(section.book_id);
   }
 }
