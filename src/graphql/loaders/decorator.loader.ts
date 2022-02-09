@@ -39,26 +39,24 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     parsed_filters = parseFilter(data.relation_table, filters);
   }
 
-  if (!gctx[data.field_name]) {
-    const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
+  const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
 
-    switch (data.loader_type) {
-      case ELoaderType.MANY_TO_ONE:
-        gctx[data.field_name] = manyToOneLoader(selected_fields, data, parsed_filters);
-        break;
-      case ELoaderType.ONE_TO_MANY:
-        gctx[data.field_name] = oneToManyLoader(selected_fields, data, parsed_filters);
-        break;
-      case ELoaderType.ONE_TO_ONE:
-        break;
-      case ELoaderType.POLYMORPHIC:
-        break;
-      case ELoaderType.MANY:
-        gctx[data.field_name] = manyLoader(selected_fields, data, parsed_filters);
-        break;
-      default:
-        break;
-    }
+  switch (data.loader_type) {
+    case ELoaderType.MANY_TO_ONE:
+      gctx[data.field_name] = manyToOneLoader(selected_fields, data, parsed_filters);
+      break;
+    case ELoaderType.ONE_TO_MANY:
+      gctx[data.field_name] = oneToManyLoader(selected_fields, data, parsed_filters);
+      break;
+    case ELoaderType.ONE_TO_ONE:
+      break;
+    case ELoaderType.POLYMORPHIC:
+      break;
+    case ELoaderType.MANY:
+      gctx[data.field_name] = manyLoader(selected_fields, data, parsed_filters);
+      break;
+    default:
+      break;
   }
 
   return gctx;
