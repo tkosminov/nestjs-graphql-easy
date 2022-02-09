@@ -2,8 +2,7 @@ import { GraphQLExecutionContext } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
-
-import { IParsedFilter, parseFilter } from '../filters/parser.filter';
+import { IFilterValue, IParsedFilter, parseFilter } from '../filters/parser.filter';
 
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
@@ -28,7 +27,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   // const [root, args, gctx, info] = ctx.getArgs();
   const args = ctx.getArgs();
 
-  const gargs = args[1];
+  const gargs: Record<string, any> | undefined | null = args[1];
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
 
@@ -36,7 +35,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   let parsed_filters: IParsedFilter = null;
 
   if (filters) {
-    parsed_filters = parseFilter(data.relation_table, filters);
+    parsed_filters = parseFilter(data.relation_table, filters as IFilterValue);
   }
 
   const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);

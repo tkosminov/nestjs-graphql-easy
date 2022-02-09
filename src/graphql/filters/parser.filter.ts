@@ -2,16 +2,16 @@ import { customAlphabet } from 'nanoid';
 
 import { EOperatorQuery, EOperationQuery } from './builder.filter';
 
-type IFilterData = Record<string, unknown>;
+export type IFilterValue = Record<string, unknown>;
 
 export interface IParsedFilter {
   query: string;
-  params: IFilterData;
+  params: IFilterValue;
 }
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
-function recursiveParseFilter(relation_table: string, data: IFilterData, field?: string) {
+function recursiveParseFilter(relation_table: string, data: IFilterValue, field?: string) {
   let query = '';
   let params = {};
 
@@ -19,7 +19,7 @@ function recursiveParseFilter(relation_table: string, data: IFilterData, field?:
     if (key === EOperatorQuery.AND || key === EOperatorQuery.OR) {
       let results = ` ${EOperatorQuery[key]} (`;
 
-      (value as IFilterData[]).forEach((v, i) => {
+      (value as IFilterValue[]).forEach((v, i) => {
         const res = recursiveParseFilter(relation_table, v);
 
         if (i > 0 && !v[EOperatorQuery.AND] && !v[EOperatorQuery.OR]) {
@@ -77,7 +77,7 @@ function recursiveParseFilter(relation_table: string, data: IFilterData, field?:
           break;
       }
     } else {
-      const res = recursiveParseFilter(relation_table, value as IFilterData, key);
+      const res = recursiveParseFilter(relation_table, value as IFilterValue, key);
 
       if (index > 0) {
         query += ' AND ';
@@ -91,6 +91,6 @@ function recursiveParseFilter(relation_table: string, data: IFilterData, field?:
   return { query, params };
 }
 
-export function parseFilter(relation_table: string, data: IFilterData) {
+export function parseFilter(relation_table: string, data: IFilterValue) {
   return recursiveParseFilter(relation_table, data);
 }
