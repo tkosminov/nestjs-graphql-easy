@@ -40,11 +40,11 @@ const buildOrderField = (_column: ColumnMetadataArgs): ReturnTypeFunc => {
   const field_input_type = function fieldInputType() {};
 
   decorateField(field_input_type, EOrderQuery.SORT, () => EOrderMethod, {
-    nullable: false,
+    nullable: true,
   });
 
   decorateField(field_input_type, EOrderQuery.NULLS, () => EOrderNulls, {
-    nullable: false,
+    nullable: true,
   });
 
   Object.defineProperty(field_input_type, 'name', {
@@ -70,7 +70,9 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
   const order_input_type = function orderInputType() {};
 
   table_columns.get(table_name).forEach((col) => {
-    decorateField(order_input_type, col.propertyName, buildOrderField(col));
+    decorateField(order_input_type, col.propertyName, buildOrderField(col), {
+      nullable: true,
+    });
   })
 
   Object.defineProperty(order_input_type, 'name', {

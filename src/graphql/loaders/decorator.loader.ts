@@ -2,9 +2,10 @@ import { GraphQLExecutionContext } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
-import { customAlphabet } from 'nanoid';
+import { OrderByCondition } from 'typeorm';
 
 import { IFilterValue, IParsedFilter, parseFilter } from '../filters/parser.filter';
+import { IOrderValue, parseOrder } from '../order/parser.order';
 
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
@@ -25,8 +26,6 @@ export interface ILoaderData {
   relation_fk: string;
 }
 
-const nanoid = customAlphabet('1234567890abcdef', 10);
-
 export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {
   // const [root, args, gctx, info] = ctx.getArgs();
   const args = ctx.getArgs();
@@ -35,7 +34,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
 
-  const field_alias: string = nanoid();
+  const field_alias: string = 'loader';
 
   const filters = gargs['WHERE'];
   let parsed_filters: IParsedFilter = null;
@@ -44,21 +43,28 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     parsed_filters = parseFilter(data.relation_table, filters as IFilterValue);
   }
 
+  const orders = gargs['ORDER']
+  let parsed_orders: OrderByCondition = null;
+
+  if (orders) {
+    parsed_orders = parseOrder(data.relation_table, orders as IOrderValue)
+  }
+
   const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
 
   switch (data.loader_type) {
     case ELoaderType.MANY_TO_ONE:
-      gctx[field_alias] = manyToOneLoader(selected_fields, data, parsed_filters);
+      gctx[field_alias] = manyToOneLoader(selected_fields, data, parsed_filters, parsed_orders);
       break;
     case ELoaderType.ONE_TO_MANY:
-      gctx[field_alias] = oneToManyLoader(selected_fields, data, parsed_filters);
+      gctx[field_alias] = oneToManyLoader(selected_fields, data, parsed_filters, parsed_orders);
       break;
     case ELoaderType.ONE_TO_ONE:
       break;
     case ELoaderType.POLYMORPHIC:
       break;
     case ELoaderType.MANY:
-      gctx[field_alias] = manyLoader(selected_fields, data, parsed_filters);
+      gctx[field_alias] = manyLoader(selected_fields, data, parsed_filters, parsed_orders);
       break;
     default:
       break;

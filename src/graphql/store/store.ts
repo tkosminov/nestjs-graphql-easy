@@ -15,8 +15,8 @@ export const table_columns: Map<string, Set<ColumnMetadataArgs>> = new Map();
 
 export const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
   fn.prototype[field_name] = Field(field_type, {
-    ...field_options,
     nullable: true,
+    ...field_options,
   })(fn.prototype, field_name);
 };
 

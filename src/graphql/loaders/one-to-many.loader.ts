@@ -1,12 +1,12 @@
 import Dataloader from 'dataloader';
-import { getRepository } from 'typeorm';
+import { getRepository, OrderByCondition } from 'typeorm';
 
 import { groupBy } from '../../helpers/array.helper';
 import { IParsedFilter } from '../filters/parser.filter';
 
 import { ILoaderData } from './decorator.loader';
 
-export const oneToManyLoader = (selected_fields: Set<string>, data: ILoaderData, filters: IParsedFilter = null) => {
+export const oneToManyLoader = (selected_fields: Set<string>, data: ILoaderData, filters: IParsedFilter | null, orders: OrderByCondition | null) => {
   return new Dataloader(async (keys: Array<string | number>) => {
     selected_fields.add('id');
     selected_fields.add(data.relation_fk);
@@ -20,6 +20,10 @@ export const oneToManyLoader = (selected_fields: Set<string>, data: ILoaderData,
 
     if (filters) {
       qb.andWhere(filters.query, filters.params);
+    }
+
+    if (orders) {
+      qb.orderBy(orders)
     }
 
     const poll_options = await qb.getMany();
