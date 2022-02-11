@@ -4,7 +4,7 @@ import { ID, InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@ne
 import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
 
 import { capitalize } from '../../helpers/string.helper';
-import { decorateField, where_field_input_types, fk_columns, parseColumns, table_columns, where_input_types } from '../store/store';
+import { decorateField, where_field_input_types, fk_columns, parseColumns, table_columns, where_input_types, indices_columns } from '../store/store';
 
 import { IFilterData } from './decorator.filter';
 
@@ -138,8 +138,12 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   const where_input_type = function whereInputType() {};
 
+  const idx_cols = indices_columns.get(table_name);
+
   table_columns.get(table_name).forEach((col) => {
-    decorateField(where_input_type, col.propertyName, buildFilterField(col));
+    if (idx_cols.has(col.propertyName)) {
+      decorateField(where_input_type, col.propertyName, buildFilterField(col));
+    }
   })
 
   Object.values(EFilterOperator).forEach((operator) => {

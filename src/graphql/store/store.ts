@@ -12,6 +12,7 @@ export const order_field_input_types: Map<string, ReturnTypeFunc> = new Map();
 
 export const fk_columns: Map<string, Set<JoinColumnMetadataArgs>> = new Map();
 export const table_columns: Map<string, Set<ColumnMetadataArgs>> = new Map();
+export const indices_columns: Map<string, Set<string>> = new Map();
 
 export const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
   fn.prototype[field_name] = Field(field_type, {
@@ -20,7 +21,7 @@ export const decorateField = (fn: () => void, field_name: string, field_type: Re
   })(fn.prototype, field_name);
 };
 
-export const parseColumns = () => {
+export function parseColumns () {
   const typeorm_metadata = getMetadataArgsStorage();
 
   if (!fk_columns.size) {
@@ -43,9 +44,31 @@ export const parseColumns = () => {
         table_columns.set(table, new Set([]));
       }
 
+      if (!indices_columns.has(table)) {
+        indices_columns.set(table, new Set([]));
+      }
+
+      if (col.options?.primary) {
+        indices_columns.get(table).add(col.propertyName)
+      }
+
       if (!(col.options?.type && typeof col.options.type === 'string' && ['json', 'jsonb'].includes(col.options.type))) {
         table_columns.get(table).add(col);
       }
     })
+
+    typeorm_metadata.indices.forEach((idx) => {
+      const table = idx.target['name'];
+
+      if (!indices_columns.has(table)) {
+        indices_columns.set(table, new Set([]));
+      }
+
+      if (idx.columns instanceof Array) {
+        idx.columns.forEach((col) => {
+          indices_columns.get(table).add(col)
+        })
+      }
+    });
   }
 }
