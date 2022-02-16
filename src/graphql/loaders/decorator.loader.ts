@@ -15,7 +15,6 @@ export enum ELoaderType {
   MANY_TO_ONE = 'MANY_TO_ONE',
   ONE_TO_MANY = 'ONE_TO_MANY',
   ONE_TO_ONE = 'ONE_TO_ONE',
-  POLYMORPHIC = 'POLYMORPHIC',
   MANY = 'MANY',
 }
 
@@ -34,7 +33,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
 
-  const field_alias: string = 'loader';
+  const field_alias = 'loader';
 
   const filters = gargs['WHERE'];
   let parsed_filters: IParsedFilter = null;
@@ -43,11 +42,11 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     parsed_filters = parseFilter(data.relation_table, filters as IFilterValue);
   }
 
-  const orders = gargs['ORDER']
+  const orders = gargs['ORDER'];
   let parsed_orders: OrderByCondition = null;
 
   if (orders) {
-    parsed_orders = parseOrder(data.relation_table, orders as IOrderValue)
+    parsed_orders = parseOrder(data.relation_table, orders as IOrderValue);
   }
 
   const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
@@ -60,8 +59,6 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
       gctx[field_alias] = oneToManyLoader(selected_fields, data, parsed_filters, parsed_orders);
       break;
     case ELoaderType.ONE_TO_ONE:
-      break;
-    case ELoaderType.POLYMORPHIC:
       break;
     case ELoaderType.MANY:
       gctx[field_alias] = manyLoader(selected_fields, data, parsed_filters, parsed_orders);

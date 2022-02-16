@@ -6,7 +6,12 @@ import { IParsedFilter } from '../filters/parser.filter';
 
 import { ILoaderData } from './decorator.loader';
 
-export const manyToOneLoader = (selected_fields: Set<string>, data: ILoaderData, filters: IParsedFilter | null, orders: OrderByCondition | null) => {
+export const manyToOneLoader = (
+  selected_fields: Set<string>,
+  data: ILoaderData,
+  filters: IParsedFilter | null,
+  orders: OrderByCondition | null
+) => {
   return new Dataloader(async (keys: Array<string | number>) => {
     selected_fields.add('id');
 
@@ -20,7 +25,7 @@ export const manyToOneLoader = (selected_fields: Set<string>, data: ILoaderData,
     }
 
     if (orders) {
-      qb.orderBy(orders)
+      qb.orderBy(orders);
     }
 
     const poll_options = await qb.getMany();

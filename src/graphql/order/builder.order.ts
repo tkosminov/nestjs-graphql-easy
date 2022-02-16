@@ -9,7 +9,7 @@ import { IOrderData } from './decorator.order';
 
 export enum EOrderQuery {
   SORT = 'SORT',
-  NULLS = 'NULLS'
+  NULLS = 'NULLS',
 }
 
 export enum EOrderMethod {
@@ -56,10 +56,10 @@ const buildOrderField = (_column: ColumnMetadataArgs): ReturnTypeFunc => {
   order_field_input_types.set(name, () => field_input_type);
 
   return () => field_input_type;
-}
+};
 
 export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
-  parseColumns()
+  parseColumns();
 
   const table_name = capitalize(data.relation_table);
 
@@ -73,7 +73,7 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
     decorateField(order_input_type, col.propertyName, buildOrderField(col), {
       nullable: true,
     });
-  })
+  });
 
   Object.defineProperty(order_input_type, 'name', {
     value: `${table_name}OrderInputType`,
@@ -84,4 +84,4 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
   order_input_types.set(table_name, () => order_input_type);
 
   return () => order_input_type;
-}
+};

@@ -1,8 +1,8 @@
-import { Field, FieldOptions, ReturnTypeFunc } from "@nestjs/graphql";
+import { Field, FieldOptions, ReturnTypeFunc } from '@nestjs/graphql';
 
-import { getMetadataArgsStorage } from "typeorm";
-import { ColumnMetadataArgs } from "typeorm/metadata-args/ColumnMetadataArgs";
-import { JoinColumnMetadataArgs } from "typeorm/metadata-args/JoinColumnMetadataArgs";
+import { getMetadataArgsStorage } from 'typeorm';
+import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
+import { JoinColumnMetadataArgs } from 'typeorm/metadata-args/JoinColumnMetadataArgs';
 
 export const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 export const where_field_input_types: Map<string, ReturnTypeFunc> = new Map();
@@ -21,7 +21,7 @@ export const decorateField = (fn: () => void, field_name: string, field_type: Re
   })(fn.prototype, field_name);
 };
 
-export function parseColumns () {
+export function parseColumns() {
   const typeorm_metadata = getMetadataArgsStorage();
 
   if (!fk_columns.size) {
@@ -49,13 +49,13 @@ export function parseColumns () {
       }
 
       if (col.options?.primary) {
-        indices_columns.get(table).add(col.propertyName)
+        indices_columns.get(table).add(col.propertyName);
       }
 
       if (!(col.options?.type && typeof col.options.type === 'string' && ['json', 'jsonb'].includes(col.options.type))) {
         table_columns.get(table).add(col);
       }
-    })
+    });
 
     typeorm_metadata.indices.forEach((idx) => {
       const table = idx.target['name'];
@@ -66,8 +66,8 @@ export function parseColumns () {
 
       if (idx.columns instanceof Array) {
         idx.columns.forEach((col) => {
-          indices_columns.get(table).add(col)
-        })
+          indices_columns.get(table).add(col);
+        });
       }
     });
   }
