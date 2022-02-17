@@ -21,17 +21,30 @@ export interface IField {
 export const gql_objects: Map<string, IObjectType> = new Map();
 export const gql_fields: Map<string, Set<IField>> = new Map();
 
+export const where_input_types: Map<string, ReturnTypeFunc> = new Map();
+export const where_field_input_types: Map<string, ReturnTypeFunc> = new Map();
+
+export const order_input_types: Map<string, ReturnTypeFunc> = new Map();
+export const order_field_input_types: Map<string, ReturnTypeFunc> = new Map();
+
+export const decorateField = (fn: () => void, field_name: string, field_type: ReturnTypeFunc, field_options?: FieldOptions) => {
+  fn.prototype[field_name] = Field(field_type, {
+    nullable: true,
+    ...field_options,
+  })(fn.prototype, field_name);
+};
+
 /**
  * Only for entity columns
  * For other use original decorator
  */
 export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOptions): PropertyDecorator {
-  return (prototype: unknown, property_key: string) => {
-    if (!gql_fields.has(prototype['name'])) {
-      gql_fields.set(prototype['name'], new Set([]));
+  return (prototype: any, property_key: string) => {
+    if (!gql_fields.has(prototype['constructor']['name'])) {
+      gql_fields.set(prototype['constructor']['name'], new Set([]));
     }
 
-    const fields = gql_fields.get(prototype['name']);
+    const fields = gql_fields.get(prototype['constructor']['name']);
 
     fields.add({
       relation_name: prototype['name'],
@@ -39,9 +52,6 @@ export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOption
       field_type_function: returnTypeFunction,
       field_options: options,
     });
-
-    delete options.filterable;
-    delete options.sortable;
 
     return GqlField(returnTypeFunction, options)(prototype, property_key);
   };
@@ -52,7 +62,7 @@ export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOption
  * For other use original decorator
  */
 export function ObjectType(options?: ObjectTypeOptions): ClassDecorator {
-  return <TFunction extends Function>(prototype: TFunction) => {
+  return (prototype: any) => {
     if (!gql_objects.has(prototype['name'])) {
       gql_objects.set(prototype['name'], {
         relation_name: prototype['name'],

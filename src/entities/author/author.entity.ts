@@ -1,19 +1,34 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { ID } from '@nestjs/graphql';
 
 import { IsString } from 'class-validator';
-import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { Field, ObjectType } from '../../graphql/store';
 
 import { Book } from '../book/book.entity';
-import { EntityHelper } from '../helper/entity.helper';
 
 @ObjectType()
 @Entity()
-export class Author extends EntityHelper {
-  @Field(() => ID)
+export class Author {
+  @Field(() => ID, { filterable: true, sortable: true })
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
-  @Field()
+  @Field(() => Date)
+  @CreateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @Field(() => Date)
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+
+  @Field(() => String, { filterable: true, sortable: true })
   @Column()
   @Index({ unique: true })
   @IsString()

@@ -1,18 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import { ID, InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
-import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
+import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
+
+import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store'
 
 import { capitalize } from '../../helpers/string.helper';
-import {
-  decorateField,
-  where_field_input_types,
-  fk_columns,
-  parseColumns,
-  table_columns,
-  where_input_types,
-  indices_columns,
-} from '../store/store';
 
 import { IFilterData } from './decorator.filter';
 
@@ -43,40 +35,8 @@ const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
-const buildFilterField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
-  let col_type: GqlTypeReference = String;
-
-  if (fk_columns.get(column.target['name'])?.has(column)) {
-    col_type = ID;
-  } else if (column.options?.type) {
-    if (column.options.primary) {
-      col_type = ID;
-    } else if (typeof column.options.type === 'function' && ['String', 'Number', 'Boolean', 'Date'].includes(column.options.type['name'])) {
-      col_type = column.options.type;
-    } else if (typeof column.options.type === 'string') {
-      switch (column.options.type) {
-        case 'uuid':
-          col_type = ID;
-          break;
-        case 'int':
-        case 'integer':
-          col_type = Int;
-          break;
-        case 'float':
-        case 'double precision':
-          col_type = Float;
-          break;
-        case 'timestamp with time zone':
-        case 'timestamp without time zone':
-          col_type = Date;
-          break;
-        case 'bool':
-        case 'boolean':
-          col_type = Boolean;
-          break;
-      }
-    }
-  }
+const buildFilterField = (column: IField): ReturnTypeFunc => {
+  let col_type: GqlTypeReference = column.field_type_function();
 
   const name = `${col_type['name']}_FilterInputType`;
 
@@ -136,8 +96,6 @@ const buildFilterField = (column: ColumnMetadataArgs): ReturnTypeFunc => {
 };
 
 export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
-  parseColumns();
-
   const table_name = capitalize(data.relation_table);
 
   if (where_input_types.has(table_name)) {
@@ -146,11 +104,9 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
 
   const where_input_type = function whereInputType() {};
 
-  const idx_cols = indices_columns.get(table_name);
-
-  table_columns.get(table_name).forEach((col) => {
-    if (idx_cols.has(col.propertyName)) {
-      decorateField(where_input_type, col.propertyName, buildFilterField(col));
+  gql_fields.get(table_name).forEach((col) => {
+    if (col.field_options?.filterable) {
+      decorateField(where_input_type, col.field_name, buildFilterField(col));
     }
   });
 

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 import { InputType, registerEnumType, ReturnTypeFunc } from '@nestjs/graphql';
-import { ColumnMetadataArgs } from 'typeorm/metadata-args/ColumnMetadataArgs';
+
+import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store'
 
 import { capitalize } from '../../helpers/string.helper';
-import { decorateField, order_field_input_types, order_input_types, parseColumns, table_columns } from '../store/store';
+
 import { IOrderData } from './decorator.order';
 
 export enum EOrderQuery {
@@ -30,7 +31,7 @@ registerEnumType(EOrderNulls, {
   name: 'EOrderNulls',
 });
 
-const buildOrderField = (_column: ColumnMetadataArgs): ReturnTypeFunc => {
+const buildOrderField = (_column: IField): ReturnTypeFunc => {
   const name = 'field_OrderInputType';
 
   if (order_field_input_types.has(name)) {
@@ -59,8 +60,6 @@ const buildOrderField = (_column: ColumnMetadataArgs): ReturnTypeFunc => {
 };
 
 export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
-  parseColumns();
-
   const table_name = capitalize(data.relation_table);
 
   if (order_input_types.has(table_name)) {
@@ -69,10 +68,12 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
 
   const order_input_type = function orderInputType() {};
 
-  table_columns.get(table_name).forEach((col) => {
-    decorateField(order_input_type, col.propertyName, buildOrderField(col), {
-      nullable: true,
-    });
+  gql_fields.get(table_name).forEach((col) => {
+    if (col.field_options?.sortable) {
+      decorateField(order_input_type, col.field_name, buildOrderField(col), {
+        nullable: true,
+      });
+    }
   });
 
   Object.defineProperty(order_input_type, 'name', {

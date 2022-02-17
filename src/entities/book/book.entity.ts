@@ -1,25 +1,40 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { ID } from '@nestjs/graphql';
 
 import { IsString, IsUUID } from 'class-validator';
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { EntityHelper } from '../helper/entity.helper';
+import { Field, ObjectType } from '../../graphql/store';
+
 import { Author } from '../author/author.entity';
 import { Section } from '../section/section.entity';
 
 @ObjectType()
 @Entity()
-export class Book extends EntityHelper {
-  @Field(() => ID)
+export class Book {
+  @Field(() => ID, { filterable: true, sortable: true })
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
-  @Field()
+  @Field(() => Date)
+  @CreateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @Field(() => Date)
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+
+  @Field(() => String)
   @Column()
   @IsString()
   public title: string;
 
-  @Field(() => ID)
+  @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
   @IsUUID()
