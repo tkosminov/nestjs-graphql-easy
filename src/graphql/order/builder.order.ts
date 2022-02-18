@@ -2,7 +2,7 @@
 
 import { InputType, registerEnumType, ReturnTypeFunc } from '@nestjs/graphql';
 
-import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store'
+import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store';
 
 import { capitalize } from '../../helpers/string.helper';
 
@@ -41,7 +41,7 @@ const buildOrderField = (_column: IField): ReturnTypeFunc => {
   const field_input_type = function fieldInputType() {};
 
   decorateField(field_input_type, EOrderQuery.SORT, () => EOrderMethod, {
-    nullable: true,
+    nullable: false,
   });
 
   decorateField(field_input_type, EOrderQuery.NULLS, () => EOrderNulls, {

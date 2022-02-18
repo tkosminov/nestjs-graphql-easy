@@ -1,6 +1,7 @@
 import { getRepository, OrderByCondition } from 'typeorm';
 
 import { IParsedFilter } from '../filters/parser.filter';
+import { IParsedPagination } from '../pagination/pagination.parser';
 
 import { ILoaderData } from './decorator.loader';
 
@@ -8,7 +9,8 @@ export const manyLoader = (
   selected_fields: Set<string>,
   data: ILoaderData,
   filters: IParsedFilter | null,
-  orders: OrderByCondition | null
+  orders: OrderByCondition | null,
+  paginations: IParsedPagination | null
 ) => {
   const qb = getRepository(data.relation_table)
     .createQueryBuilder(data.relation_table)
@@ -20,6 +22,11 @@ export const manyLoader = (
 
   if (orders) {
     qb.orderBy(orders);
+  }
+
+  if (paginations) {
+    qb.limit(paginations.limit);
+    qb.offset(paginations.offset);
   }
 
   return qb.getMany();

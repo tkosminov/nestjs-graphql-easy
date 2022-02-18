@@ -3,8 +3,9 @@ import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField
 import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
 import { Filter } from '../../graphql/filters/decorator.filter';
 import { Order } from '../../graphql/order/decorator.order';
-import { Book } from '../book/book.entity';
+import { Pagination } from '../../graphql/pagination/decorator.parser';
 
+import { Book } from '../book/book.entity';
 import { Section } from './section.entity';
 import { SectionService } from './section.service';
 
@@ -29,6 +30,7 @@ export class SectionResolver {
       relation_table: 'section',
     })
     _order: unknown,
+    @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];

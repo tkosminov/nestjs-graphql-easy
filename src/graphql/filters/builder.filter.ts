@@ -2,7 +2,7 @@
 
 import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
-import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store'
+import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store';
 
 import { capitalize } from '../../helpers/string.helper';
 
@@ -36,7 +36,7 @@ const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
 const buildFilterField = (column: IField): ReturnTypeFunc => {
-  let col_type: GqlTypeReference = column.field_type_function();
+  const col_type: GqlTypeReference = column.field_type_function();
 
   const name = `${col_type['name']}_FilterInputType`;
 

@@ -1,10 +1,11 @@
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 
 import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
-import { Book } from '../book/book.entity';
 import { Filter } from '../../graphql/filters/decorator.filter';
 import { Order } from '../../graphql/order/decorator.order';
+import { Pagination } from '../../graphql/pagination/decorator.parser';
 
+import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
 import { AuthorService } from './author.service';
 
@@ -29,6 +30,7 @@ export class AuthorResolver {
       relation_table: 'author',
     })
     _order: unknown,
+    @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
