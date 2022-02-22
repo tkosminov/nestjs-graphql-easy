@@ -48,11 +48,26 @@ export class SectionResolver {
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'book',
       relation_table: 'book',
-      relation_fk: 'book_id',
+      relation_fk: 'id',
     })
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book> {
     return await ctx[field_alias].load(section.book_id);
+  }
+
+  @ResolveField()
+  public async section_title(
+    @Parent() section: Section,
+    @Loader({
+      loader_type: ELoaderType.ONE_TO_ONE,
+      field_name: 'section_title',
+      relation_table: 'section_title',
+      relation_fk: 'section_id',
+    })
+    field_alias: string,
+    @Context() ctx: GraphQLExecutionContext
+  ): Promise<Book> {
+    return await ctx[field_alias].load(section.id);
   }
 }

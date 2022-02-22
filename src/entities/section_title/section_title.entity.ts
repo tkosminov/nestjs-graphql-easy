@@ -1,26 +1,15 @@
 import { ID } from '@nestjs/graphql';
 
 import { IsString, IsUUID } from 'class-validator';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Field, ObjectType } from '../../graphql/store';
 
-import { Book } from '../book/book.entity';
-import { SectionTitle } from '../section_title/section_title.entity';
+import { Section } from '../section/section.entity';
 
 @ObjectType()
 @Entity()
-export class Section {
+export class SectionTitle {
   @Field(() => ID, { filterable: true, sortable: true })
   @PrimaryGeneratedColumn('uuid')
   public id: string;
@@ -48,14 +37,10 @@ export class Section {
   @Index()
   @Column('uuid', { nullable: false })
   @IsUUID()
-  public book_id: string;
+  public section_id: string;
 
-  @Field(() => Book)
-  @ManyToOne(() => Book, { nullable: false })
-  @JoinColumn({ name: 'book_id' })
-  public book: Book;
-
-  @Field(() => SectionTitle, { nullable: true })
-  @OneToOne(() => SectionTitle, (section_title) => section_title.section)
-  public section_title: SectionTitle;
+  @Field(() => Section)
+  @OneToOne(() => Section, (section) => section.section_title)
+  @JoinColumn({ name: 'section_id' })
+  public section: Section;
 }

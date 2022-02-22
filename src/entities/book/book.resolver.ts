@@ -49,7 +49,7 @@ export class BookResolver {
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'author',
       relation_table: 'author',
-      relation_fk: 'author_id',
+      relation_fk: 'id',
     })
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext

@@ -1,5 +1,6 @@
 export function capitalize(str: string) {
-  const capital_char = str[0].toUpperCase();
+  const capitalized_chars = str.replace(/[-_\s.]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''));
+  const capital_char = capitalized_chars[0].toUpperCase();
 
-  return capital_char + str.slice(1);
+  return capital_char + capitalized_chars.slice(1);
 }

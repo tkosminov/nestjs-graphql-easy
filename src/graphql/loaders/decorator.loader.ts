@@ -11,6 +11,7 @@ import { IPaginationValue, IParsedPagination, parsePagination } from '../paginat
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
 import { manyLoader } from './many.loader';
+import { oneToOneLoader } from './one-to-one.loader';
 
 export enum ELoaderType {
   MANY_TO_ONE = 'MANY_TO_ONE',
@@ -34,7 +35,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
 
-  const field_alias = 'loader';
+  const field_alias = data.field_name;
 
   const filters = gargs['WHERE'];
   let parsed_filters: IParsedFilter = null;
@@ -67,6 +68,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
       gctx[field_alias] = oneToManyLoader(selected_fields, data, parsed_filters, parsed_orders);
       break;
     case ELoaderType.ONE_TO_ONE:
+      gctx[field_alias] = oneToOneLoader(selected_fields, data);
       break;
     case ELoaderType.MANY:
       gctx[field_alias] = manyLoader(selected_fields, data, parsed_filters, parsed_orders, parsed_paginations);

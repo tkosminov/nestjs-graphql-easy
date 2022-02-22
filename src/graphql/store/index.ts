@@ -1,4 +1,5 @@
 import { Field as GqlField, FieldOptions, ReturnTypeFunc, ObjectType as GqlObjectType, ObjectTypeOptions } from '@nestjs/graphql';
+import { getMetadataArgsStorage } from 'typeorm';
 
 export interface IObjectType {
   relation_name: string;
@@ -20,6 +21,8 @@ export interface IField {
 
 export const gql_objects: Map<string, IObjectType> = new Map();
 export const gql_fields: Map<string, Set<IField>> = new Map();
+
+export const table_fks: Map<string, Set<string>> = new Map();
 
 export const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 export const where_field_input_types: Map<string, ReturnTypeFunc> = new Map();
@@ -73,4 +76,24 @@ export function ObjectType(options?: ObjectTypeOptions): ClassDecorator {
 
     return GqlObjectType(prototype['name'], options)(prototype);
   };
+}
+
+export function getTableFks(table_name: string) {
+  if (table_fks.has(table_name)) {
+    return table_fks.get(table_name);
+  }
+
+  const typeormArgs = getMetadataArgsStorage();
+
+  typeormArgs.joinColumns.forEach((col) => {
+    if (!table_fks.has(col.target['name'])) {
+      table_fks.set(col.target['name'], new Set([]));
+    }
+
+    const fks = table_fks.get(col.target['name']);
+
+    fks.add(col.name);
+  });
+
+  return table_fks.get(table_name) || new Set();
 }
