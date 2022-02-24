@@ -3,7 +3,7 @@ import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField
 import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
 import { Filter } from '../../graphql/filters/decorator.filter';
 import { Order } from '../../graphql/order/decorator.order';
-import { Pagination } from '../../graphql/pagination/decorator.parser';
+import { Pagination } from '../../graphql/pagination/decorator.pagination';
 
 import { Book } from '../book/book.entity';
 import { Section } from './section.entity';

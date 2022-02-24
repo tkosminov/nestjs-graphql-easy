@@ -1,6 +1,6 @@
 import { validateDTO } from '../../helpers/validate.helper';
 
-import { PaginationInputType } from './decorator.parser';
+import { PaginationInputType } from './decorator.pagination';
 
 export interface IPaginationValue {
   page: number;

@@ -6,7 +6,7 @@ import { OrderByCondition } from 'typeorm';
 
 import { IFilterValue, IParsedFilter, parseFilter } from '../filters/parser.filter';
 import { IOrderValue, parseOrder } from '../order/parser.order';
-import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/pagination.parser';
+import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/pagination.pagination';
 
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';

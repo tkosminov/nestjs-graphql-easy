@@ -1,7 +1,7 @@
 import { getRepository, OrderByCondition } from 'typeorm';
 
 import { IParsedFilter } from '../filters/parser.filter';
-import { IParsedPagination } from '../pagination/pagination.parser';
+import { IParsedPagination } from '../pagination/pagination.pagination';
 
 import { ILoaderData } from './decorator.loader';
 
