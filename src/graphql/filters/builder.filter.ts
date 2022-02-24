@@ -21,7 +21,7 @@ export enum EFilterOperation {
   IN = 'IN',
   NOT_IN = 'NOT IN',
   ILIKE = 'ILIKE',
-  NOT_ILIKE = 'NOT_ILIKE',
+  NOT_ILIKE = 'NOT ILIKE',
   GT = '>',
   GTE = '>=',
   LT = '<',
