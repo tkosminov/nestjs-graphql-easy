@@ -1,73 +1,161 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# NestJS
 
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
-
-```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
+# NestJS-GraphQL-Example
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Installation
 
-## License
+### Dependencies
 
-Nest is [MIT licensed](LICENSE).
+* PostgreSQL 13+
+* NodeJS 14+
+
+### Installation
+
+```bash
+npm ci
+```
+
+### DB Settings
+
+sudo -i -u postgres
+
+createdb ${env}_nestjs_graphql_template
+
+## GraphQL
+
+### Entity example
+
+```ts
+import { ID } from '@nestjs/graphql';
+
+import { IsString } from 'class-validator';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { Field, ObjectType } from '../../graphql/store';
+
+...
+
+@ObjectType()
+@Entity()
+export class Author {
+  @Field(() => ID, { filterable: true, sortable: true })
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
+
+  @Field(() => Date)
+  @CreateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @Field(() => Date)
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+
+  @Field(() => String, { filterable: true, sortable: true })
+  @Column()
+  @Index({ unique: true })
+  @IsString()
+  public name: string;
+
+  @Field(() => [Book], { nullable: true })
+  @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
+  public books: Book[];
+}
+
+```
+
+### Resolver example
+
+```ts
+import { Context, GraphQLExecutionContext, Query, Parent, ResolveField, Resolver } from '@nestjs/graphql';
+
+import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
+import { Filter } from '../../graphql/filters/decorator.filter';
+import { Order } from '../../graphql/order/decorator.order';
+import { Pagination } from '../../graphql/pagination/decorator.pagination';
+
+...
+
+@Resolver(() => Author)
+export class AuthorResolver {
+  constructor(private readonly authorService: AuthorService) {}
+
+  @Query(() => [Author])
+  public async authors(
+    @Loader({
+      loader_type: ELoaderType.MANY,
+      field_name: 'authors',
+      relation_table: 'author',
+      relation_fk: 'id',
+    })
+    field_alias: string,
+    @Filter({
+      relation_table: 'author',
+    })
+    _filter: unknown,
+    @Order({
+      relation_table: 'author',
+    })
+    _order: unknown,
+    @Pagination() _pagination: unknown,
+    @Context() ctx: GraphQLExecutionContext
+  ) {
+    return await ctx[field_alias];
+  }
+
+  @ResolveField()
+  public async books(
+    @Parent() author: Author,
+    @Loader({
+      loader_type: ELoaderType.ONE_TO_MANY,
+      field_name: 'books',
+      relation_table: 'book',
+      relation_fk: 'author_id',
+    })
+    field_alias: string,
+    @Filter({
+      relation_table: 'book',
+    })
+    _filter: unknown,
+    @Order({
+      relation_table: 'book',
+    })
+    _order: unknown,
+    @Context() ctx: GraphQLExecutionContext
+  ): Promise<Book[]> {
+    return await ctx[field_alias].load(author.id);
+  }
+}
+```
+
+### GraphQL Query example
+
+```graphql
+query {
+  authors(
+    WHERE: { id: { NULL: false }, name: { ILIKE: "Author" } }
+    ORDER: { id: { SORT: ASC } }
+    PAGINATION: { page: 0, per_page: 10 }
+  ) {
+    id
+    name
+    books(ORDER: { created_at: { SORT: DESC } }) {
+      id
+      title
+    }
+  }
+}
+```
