@@ -10,6 +10,12 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 # NestJS-GraphQL-Example
 
+## Inspired
+
+* https://github.com/sulthanmamusa/graphql-dataloader
+* https://github.com/Mando75/typeorm-graphql-loader
+* https://github.com/slaypni/type-graphql-dataloader
+
 ## Installation
 
 ### Dependencies

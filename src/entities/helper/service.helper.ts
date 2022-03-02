@@ -39,7 +39,7 @@ export class ServiceHelper<T> {
   }
 
   public async save(model: T, options: SaveOptions = {}) {
-    return await this.repository.save<T>(model, options);
+    return await this.repository.save(model as DeepPartial<T>, options);
   }
 
   public async delete(id: id, options: FindOneOptions<T> = {}) {

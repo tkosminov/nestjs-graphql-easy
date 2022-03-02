@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql';
+import { GqlOptionsFactory } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import { GraphQLError, GraphQLSchema } from 'graphql';
 
@@ -14,9 +15,10 @@ const graphqlSettings = config.get<IGraphqlSettings>('GRAPHQL_SETTINGS');
 
 @Injectable()
 export class GraphqlOptions implements GqlOptionsFactory {
-  public createGqlOptions(): Promise<GqlModuleOptions> | GqlModuleOptions {
+  public createGqlOptions(): Promise<ApolloDriverConfig> | ApolloDriverConfig {
     return {
       ...graphqlSettings,
+      driver: ApolloDriver,
       autoSchemaFile: __dirname + '/schema.graphql',
       formatError: (err: GraphQLError) => {
         return err;
