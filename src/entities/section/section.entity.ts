@@ -13,7 +13,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Field, ObjectType } from '../../graphql/store';
+import { Field, ObjectType } from '@gql/store';
 
 import { Book } from '../book/book.entity';
 import { SectionTitle } from '../section_title/section_title.entity';

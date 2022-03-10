@@ -69,8 +69,8 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
   const order_input_type = function orderInputType() {};
 
   gql_fields.get(table_name).forEach((col) => {
-    if (col.field_options?.sortable) {
-      decorateField(order_input_type, col.field_name, buildOrderField(col), {
+    if (col.options?.sortable) {
+      decorateField(order_input_type, col.name, buildOrderField(col), {
         nullable: true,
       });
     }

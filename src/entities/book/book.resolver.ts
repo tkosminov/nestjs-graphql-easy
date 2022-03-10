@@ -1,9 +1,10 @@
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 
-import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
-import { Filter } from '../../graphql/filters/decorator.filter';
-import { Order } from '../../graphql/order/decorator.order';
-import { Pagination } from '../../graphql/pagination/decorator.pagination';
+import { Query, ResolveField } from '@gql/store';
+import { ELoaderType, Loader } from '@gql/loaders/decorator.loader';
+import { Filter } from '@gql/filters/decorator.filter';
+import { Order } from '@gql/order/decorator.order';
+import { Pagination } from '@gql/pagination/decorator.pagination';
 
 import { Author } from '../author/author.entity';
 import { Section } from '../section/section.entity';
@@ -42,7 +43,7 @@ export class BookResolver {
     return await this.bookService.findOne(id);
   }
 
-  @ResolveField()
+  @ResolveField(() => Author)
   public async author(
     @Parent() book: Book,
     @Loader({
@@ -57,7 +58,7 @@ export class BookResolver {
     return await ctx[field_alias].load(book.author_id);
   }
 
-  @ResolveField()
+  @ResolveField(() => [Section])
   public async sections(
     @Parent() book: Book,
     @Loader({

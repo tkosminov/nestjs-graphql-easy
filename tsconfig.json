@@ -18,7 +18,12 @@
     "typeRoots": [
       "node_modules/@types",
       "types"
-    ]
+    ],
+    "paths": {
+      "@helpers/*": ["./src/helpers/*"],
+      "@errors/*": ["./src/errors/*"],
+      "@gql/*": ["./src/graphql/*"],
+    }
   },
   "exclude": [
     "node_modules",

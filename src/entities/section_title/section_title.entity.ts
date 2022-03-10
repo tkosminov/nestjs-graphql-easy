@@ -3,7 +3,7 @@ import { ID } from '@nestjs/graphql';
 import { IsString, IsUUID } from 'class-validator';
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { Field, ObjectType } from '../../graphql/store';
+import { Field, ObjectType } from '@gql/store';
 
 import { Section } from '../section/section.entity';
 

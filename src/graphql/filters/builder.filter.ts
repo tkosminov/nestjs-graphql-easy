@@ -36,7 +36,7 @@ const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
 const buildFilterField = (column: IField): ReturnTypeFunc => {
-  const col_type: GqlTypeReference = column.field_type_function();
+  const col_type: GqlTypeReference = column.type_function();
 
   const name = `${col_type['name']}_FilterInputType`;
 
@@ -105,8 +105,8 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
   const where_input_type = function whereInputType() {};
 
   gql_fields.get(table_name).forEach((col) => {
-    if (col.field_options?.filterable) {
-      decorateField(where_input_type, col.field_name, buildFilterField(col));
+    if (col.options?.filterable) {
+      decorateField(where_input_type, col.name, buildFilterField(col));
     }
   });
 

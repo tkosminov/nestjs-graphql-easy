@@ -1,12 +1,15 @@
-import { Context, GraphQLExecutionContext, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
-import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
-import { Filter } from '../../graphql/filters/decorator.filter';
-import { Order } from '../../graphql/order/decorator.order';
-import { Pagination } from '../../graphql/pagination/decorator.pagination';
+import { Query, ResolveField } from '@gql/store';
+import { ELoaderType, Loader } from '@gql/loaders/decorator.loader';
+import { Filter } from '@gql/filters/decorator.filter';
+import { Order } from '@gql/order/decorator.order';
+import { Pagination } from '@gql/pagination/decorator.pagination';
 
 import { SectionTitle } from './section_title.entity';
 import { SectionTitleService } from './section_title.service';
+
+import { Section } from '../section/section.entity';
 
 @Resolver(() => SectionTitle)
 export class SectionTitleResolver {
@@ -35,7 +38,7 @@ export class SectionTitleResolver {
     return await ctx[field_alias];
   }
 
-  @ResolveField()
+  @ResolveField(() => Section)
   public async section(
     @Parent() section_title: SectionTitle,
     @Loader({

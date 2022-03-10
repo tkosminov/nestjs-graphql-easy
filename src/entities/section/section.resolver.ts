@@ -1,13 +1,16 @@
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 
-import { ELoaderType, Loader } from '../../graphql/loaders/decorator.loader';
-import { Filter } from '../../graphql/filters/decorator.filter';
-import { Order } from '../../graphql/order/decorator.order';
-import { Pagination } from '../../graphql/pagination/decorator.pagination';
+import { Query, ResolveField } from '@gql/store';
+import { ELoaderType, Loader } from '@gql/loaders/decorator.loader';
+import { Filter } from '@gql/filters/decorator.filter';
+import { Order } from '@gql/order/decorator.order';
+import { Pagination } from '@gql/pagination/decorator.pagination';
 
 import { Book } from '../book/book.entity';
 import { Section } from './section.entity';
 import { SectionService } from './section.service';
+
+import { SectionTitle } from '../section_title/section_title.entity';
 
 @Resolver(() => Section)
 export class SectionResolver {
@@ -41,7 +44,7 @@ export class SectionResolver {
     return await this.sectionService.findOne(id);
   }
 
-  @ResolveField()
+  @ResolveField(() => Book)
   public async book(
     @Parent() section: Section,
     @Loader({
@@ -56,7 +59,7 @@ export class SectionResolver {
     return await ctx[field_alias].load(section.book_id);
   }
 
-  @ResolveField()
+  @ResolveField(() => SectionTitle)
   public async section_title(
     @Parent() section: Section,
     @Loader({

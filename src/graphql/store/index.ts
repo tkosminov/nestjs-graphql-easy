@@ -1,4 +1,18 @@
-import { Field as GqlField, FieldOptions, ReturnTypeFunc, ObjectType as GqlObjectType, ObjectTypeOptions } from '@nestjs/graphql';
+import {
+  ReturnTypeFunc,
+  Field as GqlField,
+  FieldOptions,
+  ObjectType as GqlObjectType,
+  ObjectTypeOptions,
+  Query as GqlQuery,
+  QueryOptions,
+  ResolveField as GqlResolveField,
+  ResolveFieldOptions,
+  Mutation as GqlMutation,
+  MutationOptions,
+  Resolver as GqlResolver,
+  ResolverOptions
+} from '@nestjs/graphql';
 import { getMetadataArgsStorage } from 'typeorm';
 
 export interface IObjectType {
@@ -14,13 +28,36 @@ interface IFieldOptions extends FieldOptions {
 
 export interface IField {
   relation_name: string;
-  field_name: string;
-  field_type_function: ReturnTypeFunc;
-  field_options?: IFieldOptions;
+  name: string;
+  name_origin: string;
+  type_function: ReturnTypeFunc;
+  options?: IFieldOptions;
+}
+
+export interface IQueryOrMutation {
+  resolver_name: string;
+  name: string;
+  name_origin: string;
+  type_function: ReturnTypeFunc;
+}
+
+export interface IQuery extends IQueryOrMutation {
+  options?: QueryOptions;
+}
+
+export interface IMutation extends IQueryOrMutation {
+  options?: MutationOptions;
+}
+
+export interface IResolveField extends IQueryOrMutation {
+  options?: ResolveFieldOptions;
 }
 
 export const gql_objects: Map<string, IObjectType> = new Map();
 export const gql_fields: Map<string, Set<IField>> = new Map();
+export const gql_queries: Map<string, IQuery> = new Map();
+export const gql_mutations: Map<string, IMutation> = new Map();
+export const gql_resolve_fields: Map<string, IResolveField> = new Map();
 
 export const table_fks: Map<string, Set<string>> = new Map();
 
@@ -37,6 +74,60 @@ export const decorateField = (fn: () => void, field_name: string, field_type: Re
   })(fn.prototype, field_name);
 };
 
+export function Query(returnTypeFunction: ReturnTypeFunc, options?: QueryOptions): MethodDecorator {
+  return (prototype: any, property_key: string, descriptor: PropertyDescriptor) => {
+    const name = options?.name || property_key;
+
+    if (!gql_queries.has(name)) {
+      gql_queries.set(name, {
+        resolver_name: prototype.constructor['name'],
+        name,
+        name_origin: property_key,
+        type_function: returnTypeFunction,
+        options,
+      });
+    }
+
+    return GqlQuery(returnTypeFunction, options)(prototype, property_key, descriptor);
+  };
+}
+
+export function Mutation(returnTypeFunction: ReturnTypeFunc, options?: MutationOptions): MethodDecorator {
+  return (prototype: any, property_key: string, descriptor: PropertyDescriptor) => {
+    const name = options?.name || property_key;
+
+    if (!gql_mutations.has(name)) {
+      gql_mutations.set(name, {
+        resolver_name: prototype.constructor['name'],
+        name,
+        name_origin: property_key,
+        type_function: returnTypeFunction,
+        options,
+      });
+    }
+
+    return GqlMutation(returnTypeFunction, options)(prototype, property_key, descriptor);
+  };
+}
+
+export function ResolveField(returnTypeFunction: ReturnTypeFunc, options?: ResolveFieldOptions): MethodDecorator {
+  return (prototype: any, property_key: string, descriptor: PropertyDescriptor) => {
+    const name = options?.name || property_key;
+
+    if (!gql_resolve_fields.has(name)) {
+      gql_resolve_fields.set(name, {
+        resolver_name: prototype.constructor['name'],
+        name,
+        name_origin: property_key,
+        type_function: returnTypeFunction,
+        options,
+      });
+    }
+
+    return GqlResolveField(returnTypeFunction, options)(prototype, property_key, descriptor);
+  };
+}
+
 /**
  * Only for entity columns
  * For other use original decorator
@@ -51,9 +142,10 @@ export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOption
 
     fields.add({
       relation_name: prototype['name'],
-      field_name: property_key,
-      field_type_function: returnTypeFunction,
-      field_options: options,
+      name: options?.name || property_key,
+      name_origin: property_key,
+      type_function: returnTypeFunction,
+      options,
     });
 
     return GqlField(returnTypeFunction, options)(prototype, property_key);

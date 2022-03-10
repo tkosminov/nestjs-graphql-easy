@@ -3,7 +3,7 @@ import { ID } from '@nestjs/graphql';
 import { IsString } from 'class-validator';
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { Field, ObjectType } from '../../graphql/store';
+import { Field, ObjectType } from '@gql/store';
 
 import { Book } from '../book/book.entity';
 
