@@ -3,7 +3,7 @@ import { getRepository, OrderByCondition } from 'typeorm';
 
 import { capitalize } from '../../helpers/string.helper';
 import { groupBy } from '../../helpers/array.helper';
-import { IParsedFilter } from '../filters/parser.filter';
+import { IParsedFilter } from '../filter/parser.filter';
 import { getTableFks } from '../store';
 
 import { ILoaderData } from './decorator.loader';

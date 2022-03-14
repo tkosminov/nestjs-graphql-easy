@@ -1,11 +1,13 @@
-import { ID } from '@nestjs/graphql';
+import { Extensions, ID } from '@nestjs/graphql';
 
 import { IsString } from 'class-validator';
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Field, ObjectType } from '@gql/store';
+import { checkRoleMiddleware } from '@gql/permission/field.middleware';
 
 import { Book } from '../book/book.entity';
+
 
 @ObjectType()
 @Entity()
@@ -28,13 +30,13 @@ export class Author {
   })
   public updated_at: Date;
 
-  @Field(() => String, { filterable: true, sortable: true })
+  @Extensions({ role: 'ADMIN' })
+  @Field(() => String, { filterable: true, sortable: true, middleware: [checkRoleMiddleware] })
   @Column()
   @Index({ unique: true })
   @IsString()
   public name: string;
 
-  @Field(() => [Book], { nullable: true })
   @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
   public books: Book[];
 }

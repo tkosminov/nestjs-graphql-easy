@@ -39,7 +39,6 @@ export class SectionTitle {
   @IsUUID()
   public section_id: string;
 
-  @Field(() => Section)
   @OneToOne(() => Section, (section) => section.section_title)
   @JoinColumn({ name: 'section_id' })
   public section: Section;

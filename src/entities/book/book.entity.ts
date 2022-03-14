@@ -50,12 +50,10 @@ export class Book {
   @IsUUID()
   public author_id: string;
 
-  @Field(() => Author)
   @ManyToOne(() => Author, { nullable: false })
   @JoinColumn({ name: 'author_id' })
   public author: Author;
 
-  @Field(() => [Section], { nullable: true })
   @OneToMany(() => Section, (section) => section.book, { onDelete: 'CASCADE' })
   public sections: Section[];
 }

@@ -4,7 +4,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
 import { OrderByCondition } from 'typeorm';
 
-import { IFilterValue, IParsedFilter, parseFilter } from '../filters/parser.filter';
+import { IFilterValue, IParsedFilter, parseFilter } from '../filter/parser.filter';
 import { IOrderValue, parseOrder } from '../order/parser.order';
 import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/parser.pagination';
 

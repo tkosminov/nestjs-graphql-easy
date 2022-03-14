@@ -50,12 +50,10 @@ export class Section {
   @IsUUID()
   public book_id: string;
 
-  @Field(() => Book)
   @ManyToOne(() => Book, { nullable: false })
   @JoinColumn({ name: 'book_id' })
   public book: Book;
 
-  @Field(() => SectionTitle, { nullable: true })
   @OneToOne(() => SectionTitle, (section_title) => section_title.section)
   public section_title: SectionTitle;
 }
