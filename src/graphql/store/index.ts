@@ -11,7 +11,7 @@ import {
   Mutation as GqlMutation,
   MutationOptions,
   Resolver as GqlResolver,
-  ResolverOptions
+  ResolverOptions,
 } from '@nestjs/graphql';
 import { getMetadataArgsStorage } from 'typeorm';
 

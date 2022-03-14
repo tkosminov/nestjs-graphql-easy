@@ -8,7 +8,6 @@ import { checkRoleMiddleware } from '@gql/permission/field.middleware';
 
 import { Book } from '../book/book.entity';
 
-
 @ObjectType()
 @Entity()
 export class Author {

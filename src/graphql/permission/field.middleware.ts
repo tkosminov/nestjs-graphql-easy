@@ -3,11 +3,18 @@ import { NextFn, FieldMiddleware, MiddlewareContext, GraphQLExecutionContext } f
 import { GraphQLResolveInfo } from 'graphql';
 import { access_denied } from '@errors';
 
-export const checkRoleMiddleware: FieldMiddleware = async <T>(
-  ctx: MiddlewareContext,
-  next: NextFn,
-) => {
-  const { args, info, context, source }: { args: Record<string, unknown>; info: GraphQLResolveInfo; context: GraphQLExecutionContext & { user: any }; source: Partial<T> } = ctx;
+export const checkRoleMiddleware: FieldMiddleware = async <T>(ctx: MiddlewareContext, next: NextFn) => {
+  const {
+    args,
+    info,
+    context,
+    source,
+  }: {
+    args: Record<string, unknown>;
+    info: GraphQLResolveInfo;
+    context: GraphQLExecutionContext & { user: any };
+    source: Partial<T>;
+  } = ctx;
 
   const { extensions } = info.parentType.getFields()[info.fieldName];
 
