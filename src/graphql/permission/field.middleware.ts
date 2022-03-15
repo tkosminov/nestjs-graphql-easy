@@ -1,9 +1,21 @@
 import { NextFn, FieldMiddleware, MiddlewareContext, GraphQLExecutionContext } from '@nestjs/graphql';
 
 import { GraphQLResolveInfo } from 'graphql';
-import { access_denied } from '@errors';
+import { Request } from 'express';
 
-export const checkRoleMiddleware: FieldMiddleware = async <T>(ctx: MiddlewareContext, next: NextFn) => {
+import { access_denied } from '@errors';
+import { LoggerStore } from '@logger/logger.store';
+
+/**
+ * set in file src/graphql/graphql.options.ts
+ */
+interface IContext {
+  req: Request;
+  logger_store: LoggerStore;
+  user: any;
+}
+
+export const checkRoleMiddleware: FieldMiddleware = async (ctx: MiddlewareContext, next: NextFn) => {
   const {
     args,
     info,
@@ -12,8 +24,8 @@ export const checkRoleMiddleware: FieldMiddleware = async <T>(ctx: MiddlewareCon
   }: {
     args: Record<string, unknown>;
     info: GraphQLResolveInfo;
-    context: GraphQLExecutionContext & { user: any };
-    source: Partial<T>;
+    context: IContext;
+    source: Record<string, unknown>;
   } = ctx;
 
   const { extensions } = info.parentType.getFields()[info.fieldName];

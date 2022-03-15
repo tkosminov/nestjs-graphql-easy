@@ -3,9 +3,10 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 
+import { LoggerStore } from '@logger/logger.store';
+
 import { getAction, getForwardedIp, getIp, getMethod, getOrigin, getPath, getReferrer, getUserAgent } from '../helpers/req.helper';
 import { LoggerService } from '../logger/logger.service';
-import { LoggerStore } from '../logger/logger.store';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {

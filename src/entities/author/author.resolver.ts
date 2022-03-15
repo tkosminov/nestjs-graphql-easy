@@ -7,6 +7,7 @@ import { Filter } from '@gql/filter/decorator.filter';
 import { Order } from '@gql/order/decorator.order';
 import { Pagination } from '@gql/pagination/decorator.pagination';
 import { GqlAuthGuard } from '@gql/permission/resolver.guard';
+import { checkRoleMiddleware } from '@gql/permission/field.middleware';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
@@ -45,7 +46,7 @@ export class AuthorResolver {
     return await this.authorService.findOne(id);
   }
 
-  @ResolveField(() => [Book], { nullable: true })
+  @ResolveField(() => [Book], { nullable: true, middleware: [checkRoleMiddleware] })
   public async books(
     @Parent() author: Author,
     @Loader({

@@ -23,6 +23,7 @@
       "@helpers/*": ["./src/helpers/*"],
       "@errors": ["./src/errors/index"],
       "@gql/*": ["./src/graphql/*"],
+      "@logger/*": ["./src/logger/*"],
     }
   },
   "exclude": [
