@@ -54,6 +54,10 @@ export class AuthorResolver {
       field_name: 'books',
       relation_table: 'book',
       relation_fk: 'author_id',
+      relation_where: {
+        query: 'book.is_private = :is_private',
+        params: { is_private: false },
+      },
     })
     field_alias: string,
     @Filter({

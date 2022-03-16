@@ -1,6 +1,5 @@
 import { ID } from '@nestjs/graphql';
 
-import { IsString, IsUUID } from 'class-validator';
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Field, ObjectType } from '@gql/store';
@@ -30,13 +29,11 @@ export class SectionTitle {
 
   @Field(() => String)
   @Column()
-  @IsString()
   public title: string;
 
   @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
-  @IsUUID()
   public section_id: string;
 
   @OneToOne(() => Section, (section) => section.section_title)

@@ -1,6 +1,5 @@
 import { Extensions, ID } from '@nestjs/graphql';
 
-import { IsString } from 'class-validator';
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Field, ObjectType } from '@gql/store';
@@ -33,7 +32,6 @@ export class Author {
   @Field(() => String, { filterable: true, sortable: true, middleware: [checkRoleMiddleware] })
   @Column()
   @Index({ unique: true })
-  @IsString()
   public name: string;
 
   @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })

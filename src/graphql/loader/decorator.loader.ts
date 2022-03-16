@@ -25,6 +25,10 @@ export interface ILoaderData {
   field_name: string;
   relation_table: string;
   relation_fk: string;
+  relation_where?: {
+    query: string;
+    params?: Record<string, unknown>;
+  };
 }
 
 export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {

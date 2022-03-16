@@ -1,6 +1,5 @@
 import { ID } from '@nestjs/graphql';
 
-import { IsString, IsUUID } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
@@ -41,13 +40,11 @@ export class Section {
 
   @Field(() => String)
   @Column()
-  @IsString()
   public title: string;
 
   @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
-  @IsUUID()
   public book_id: string;
 
   @ManyToOne(() => Book, { nullable: false })

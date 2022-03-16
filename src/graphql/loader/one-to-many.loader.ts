@@ -29,6 +29,10 @@ export const oneToManyLoader = (
         keys,
       });
 
+    if (data.relation_where) {
+      qb.andWhere(data.relation_where.query, data.relation_where.params);
+    }
+
     if (filters) {
       qb.andWhere(filters.query, filters.params);
     }

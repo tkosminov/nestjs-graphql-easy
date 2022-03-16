@@ -14,10 +14,15 @@ export const manyLoader = (
 ) => {
   const qb = getRepository(data.relation_table)
     .createQueryBuilder(data.relation_table)
-    .select(Array.from(selected_fields).map((selected_field) => `${data.relation_table}.${selected_field}`));
+    .select(Array.from(selected_fields).map((selected_field) => `${data.relation_table}.${selected_field}`))
+    .where(`${data.relation_table}.id IS NOT NULL`);
+
+  if (data.relation_where) {
+    qb.andWhere(data.relation_where.query, data.relation_where.params);
+  }
 
   if (filters) {
-    qb.where(filters.query, filters.params);
+    qb.andWhere(filters.query, filters.params);
   }
 
   if (orders) {
