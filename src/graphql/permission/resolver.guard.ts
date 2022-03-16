@@ -4,8 +4,8 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { access_denied } from '@errors';
 
 @Injectable()
-export class GqlAuthGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+class GqlAuthGuard implements CanActivate {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context) as GqlExecutionContext & { user: any };
 
     const user = ctx.user;
@@ -17,3 +17,7 @@ export class GqlAuthGuard implements CanActivate {
     return true;
   }
 }
+
+export const guards = {
+  auth: GqlAuthGuard,
+};

@@ -12,7 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Field, ObjectType } from '@gql/store';
+import { Field, ObjectType } from '@gql';
 
 import { Author } from '../author/author.entity';
 import { Section } from '../section/section.entity';

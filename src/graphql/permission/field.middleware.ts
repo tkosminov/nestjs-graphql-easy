@@ -15,7 +15,7 @@ interface IContext {
   user: any;
 }
 
-export const checkRoleMiddleware: FieldMiddleware = async (ctx: MiddlewareContext, next: NextFn) => {
+const checkRoleMiddleware: FieldMiddleware = async (ctx: MiddlewareContext, next: NextFn) => {
   const {
     args,
     info,
@@ -37,4 +37,8 @@ export const checkRoleMiddleware: FieldMiddleware = async (ctx: MiddlewareContex
   }
 
   return await next();
+};
+
+export const middlewares = {
+  role: checkRoleMiddleware,
 };

@@ -1,10 +1,6 @@
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 
-import { Query, ResolveField } from '@gql/store';
-import { ELoaderType, Loader } from '@gql/loader/decorator.loader';
-import { Filter } from '@gql/filter/decorator.filter';
-import { Order } from '@gql/order/decorator.order';
-import { Pagination } from '@gql/pagination/decorator.pagination';
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
 
 import { Book } from '../book/book.entity';
 import { Section } from './section.entity';

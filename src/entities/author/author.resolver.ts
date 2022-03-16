@@ -1,13 +1,7 @@
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
-import { Query, ResolveField } from '@gql/store';
-import { ELoaderType, Loader } from '@gql/loader/decorator.loader';
-import { Filter } from '@gql/filter/decorator.filter';
-import { Order } from '@gql/order/decorator.order';
-import { Pagination } from '@gql/pagination/decorator.pagination';
-import { GqlAuthGuard } from '@gql/permission/resolver.guard';
-import { checkRoleMiddleware } from '@gql/permission/field.middleware';
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination, middlewares, guards } from '@gql';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
@@ -17,7 +11,7 @@ import { AuthorService } from './author.service';
 export class AuthorResolver {
   constructor(private readonly authorService: AuthorService) {}
 
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(guards.auth)
   @Query(() => [Author])
   public async authors(
     @Loader({
@@ -46,7 +40,7 @@ export class AuthorResolver {
     return await this.authorService.findOne(id);
   }
 
-  @ResolveField(() => [Book], { nullable: true, middleware: [checkRoleMiddleware] })
+  @ResolveField(() => [Book], { nullable: true, middleware: [middlewares.role] })
   public async books(
     @Parent() author: Author,
     @Loader({

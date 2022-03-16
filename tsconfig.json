@@ -22,7 +22,7 @@
     "paths": {
       "@helpers/*": ["./src/helpers/*"],
       "@errors": ["./src/errors/index"],
-      "@gql/*": ["./src/graphql/*"],
+      "@gql": ["./src/graphql/index"],
       "@logger/*": ["./src/logger/*"],
     }
   },

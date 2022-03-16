@@ -2,8 +2,7 @@ import { Extensions, ID } from '@nestjs/graphql';
 
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-import { Field, ObjectType } from '@gql/store';
-import { checkRoleMiddleware } from '@gql/permission/field.middleware';
+import { ObjectType, Field, middlewares } from '@gql';
 
 import { Book } from '../book/book.entity';
 
@@ -29,7 +28,7 @@ export class Author {
   public updated_at: Date;
 
   @Extensions({ role: 'ADMIN' })
-  @Field(() => String, { filterable: true, sortable: true, middleware: [checkRoleMiddleware] })
+  @Field(() => String, { filterable: true, sortable: true, middleware: [middlewares.role] })
   @Column()
   @Index({ unique: true })
   public name: string;
