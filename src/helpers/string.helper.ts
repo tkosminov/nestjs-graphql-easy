@@ -4,3 +4,11 @@ export function capitalize(str: string) {
 
   return capital_char + capitalized_chars.slice(1);
 }
+
+export function underscore(str: string) {
+  return str
+    .replace(/(?:^|\.?)([A-Z])/g, function (x, y) {
+      return '_' + y.toLowerCase();
+    })
+    .replace(/^_/, '');
+}

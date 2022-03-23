@@ -6,7 +6,8 @@ import { Book } from '../book/book.entity';
 import { Section } from './section.entity';
 import { SectionService } from './section.service';
 
-import { SectionTitle } from '../section_title/section_title.entity';
+import { SectionTitle } from '../section-title/section-title.entity';
+import { Item } from '../item/item.entity';
 
 @Resolver(() => Section)
 export class SectionResolver {
@@ -67,6 +68,29 @@ export class SectionResolver {
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book> {
+    return await ctx[field_alias].load(section.id);
+  }
+
+  @ResolveField(() => [Item], { nullable: true })
+  public async items(
+    @Parent() section: Section,
+    @Loader({
+      loader_type: ELoaderType.ONE_TO_MANY,
+      field_name: 'items',
+      relation_table: 'item',
+      relation_fk: 'section_id',
+    })
+    field_alias: string,
+    @Filter({
+      relation_table: 'item',
+    })
+    _filter: unknown,
+    @Order({
+      relation_table: 'item',
+    })
+    _order: unknown,
+    @Context() ctx: GraphQLExecutionContext
+  ): Promise<Section[]> {
     return await ctx[field_alias].load(section.id);
   }
 }

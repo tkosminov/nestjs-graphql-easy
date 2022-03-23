@@ -12,18 +12,21 @@ import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
 import { manyLoader } from './many.loader';
 import { oneToOneLoader } from './one-to-one.loader';
+import { underscore } from '@helpers/string.helper';
+import { getTableColumns } from '../store';
 
 export enum ELoaderType {
   MANY_TO_ONE = 'MANY_TO_ONE',
   ONE_TO_MANY = 'ONE_TO_MANY',
   ONE_TO_ONE = 'ONE_TO_ONE',
   MANY = 'MANY',
+  POLYMORPHIC = 'POLYMORPHIC',
 }
 
 export interface ILoaderData {
   loader_type: ELoaderType;
   field_name: string;
-  relation_table: string;
+  relation_table?: string;
   relation_fk: string;
   relation_where?: {
     query: string;
@@ -35,11 +38,12 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   // const [root, args, gctx, info] = ctx.getArgs();
   const args = ctx.getArgs();
 
+  const parent: Record<string, unknown> | null = args[0];
   const gargs: Record<string, any> | undefined | null = args[1];
   const gctx: GraphQLExecutionContext = args[2];
   const info: GraphQLResolveInfo = args[3];
 
-  const field_alias = data.field_name;
+  let field_alias = data.field_name;
 
   const filters = gargs['WHERE'];
   let parsed_filters: IParsedFilter = null;
@@ -76,6 +80,15 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
       break;
     case ELoaderType.MANY:
       gctx[field_alias] = manyLoader(selected_fields, data, parsed_filters, parsed_orders, parsed_paginations);
+      break;
+    case ELoaderType.POLYMORPHIC:
+      const table_name = underscore(parent['itemable_type'] as string);
+      field_alias = table_name;
+
+      const table_cols = getTableColumns(parent['itemable_type'] as string);
+      const fields = new Set(Array.from(selected_fields).filter((field) => table_cols.has(field)));
+
+      gctx[field_alias] = oneToOneLoader(fields, { ...data, ...{ relation_table: table_name } });
       break;
     default:
       break;

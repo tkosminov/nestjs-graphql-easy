@@ -60,6 +60,7 @@ export const gql_mutations: Map<string, IMutation> = new Map();
 export const gql_resolve_fields: Map<string, IResolveField> = new Map();
 
 export const table_fks: Map<string, Set<string>> = new Map();
+export const table_columns: Map<string, Set<string>> = new Map();
 
 export const where_input_types: Map<string, ReturnTypeFunc> = new Map();
 export const where_field_input_types: Map<string, ReturnTypeFunc> = new Map();
@@ -170,6 +171,16 @@ export function ObjectType(options?: ObjectTypeOptions): ClassDecorator {
   };
 }
 
+export function Polymorphic() {
+  return (prototype: any, property_key: string) => {
+    if (!table_fks.has(prototype['constructor']['name'])) {
+      table_fks.set(prototype['constructor']['name'], new Set([]));
+    }
+
+    table_fks.get(prototype['constructor']['name']).add(property_key);
+  };
+}
+
 export function getTableFks(table_name: string) {
   if (table_fks.has(table_name)) {
     return table_fks.get(table_name);
@@ -188,4 +199,24 @@ export function getTableFks(table_name: string) {
   });
 
   return table_fks.get(table_name) || new Set();
+}
+
+export function getTableColumns(table_name: string) {
+  if (table_columns.has(table_name)) {
+    return table_columns.get(table_name);
+  }
+
+  const typeormArgs = getMetadataArgsStorage();
+
+  typeormArgs.columns.forEach((col) => {
+    if (!table_columns.has(col.target['name'])) {
+      table_columns.set(col.target['name'], new Set([]));
+    }
+
+    const columns = table_columns.get(col.target['name']);
+
+    columns.add(col.propertyName);
+  });
+
+  return table_columns.get(table_name) || new Set();
 }

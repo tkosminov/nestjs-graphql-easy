@@ -7,6 +7,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,7 +16,8 @@ import {
 import { Field, ObjectType } from '@gql';
 
 import { Book } from '../book/book.entity';
-import { SectionTitle } from '../section_title/section_title.entity';
+import { SectionTitle } from '../section-title/section-title.entity';
+import { Item } from '../item/item.entity';
 
 @ObjectType()
 @Entity()
@@ -53,4 +55,7 @@ export class Section {
 
   @OneToOne(() => SectionTitle, (section_title) => section_title.section)
   public section_title: SectionTitle;
+
+  @OneToMany(() => Item, (item) => item.section, { onDelete: 'CASCADE' })
+  public items: Item[];
 }

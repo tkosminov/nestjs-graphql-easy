@@ -2,8 +2,8 @@ import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/grap
 
 import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
 
-import { SectionTitle } from './section_title.entity';
-import { SectionTitleService } from './section_title.service';
+import { SectionTitle } from './section-title.entity';
+import { SectionTitleService } from './section-title.service';
 
 import { Section } from '../section/section.entity';
 
