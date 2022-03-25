@@ -1,8 +1,8 @@
 import { Extensions, ID } from '@nestjs/graphql';
 
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Index, OneToMany } from 'typeorm';
 
-import { ObjectType, Field, middlewares } from '@gql';
+import { ObjectType, Field, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
 
 import { Book } from '../book/book.entity';
 
@@ -28,7 +28,7 @@ export class Author {
   public updated_at: Date;
 
   @Extensions({ role: 'ADMIN' })
-  @Field(() => String, { filterable: true, sortable: true, middleware: [middlewares.role] })
+  @Field(() => String, { filterable: true, sortable: true })
   @Column()
   @Index({ unique: true })
   public name: string;

@@ -37,19 +37,18 @@ createdb ${env}_nestjs_graphql_template
 
 ## GraphQL
 
-### Entity example
+### Basic Example
+
+#### Entity
 
 ```ts
-import { Extensions, ID } from '@nestjs/graphql';
+import { ID } from '@nestjs/graphql';
 
-import { IsString } from 'class-validator';
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Index, OneToMany } from 'typeorm';
 
-import { Field, ObjectType } from '@gql/store';
-import { checkRoleMiddleware } from '@gql/permission/field.middleware';
+import { ObjectType, Field, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
 
 import { Book } from '../book/book.entity';
-
 
 @ObjectType()
 @Entity()
@@ -72,32 +71,22 @@ export class Author {
   })
   public updated_at: Date;
 
-  @Extensions({ role: 'ADMIN' })
-  @Field(() => String, { filterable: true, sortable: true, middleware: [checkRoleMiddleware] })
+  @Field(() => String, { filterable: true, sortable: true })
   @Column()
   @Index({ unique: true })
-  @IsString()
   public name: string;
 
   @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
   public books: Book[];
 }
-
-
 ```
 
-### Resolver example
+#### Resolver
 
 ```ts
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
 
-import { Query, ResolveField } from '@gql/store';
-import { ELoaderType, Loader } from '@gql/loader/decorator.loader';
-import { Filter } from '@gql/filter/decorator.filter';
-import { Order } from '@gql/order/decorator.order';
-import { Pagination } from '@gql/pagination/decorator.pagination';
-import { GqlAuthGuard } from '@gql/permission/resolver.guard';
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
@@ -107,24 +96,17 @@ import { AuthorService } from './author.service';
 export class AuthorResolver {
   constructor(private readonly authorService: AuthorService) {}
 
-  @UseGuards(GqlAuthGuard)
   @Query(() => [Author])
   public async authors(
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'authors',
-      relation_table: 'author',
-      relation_fk: 'id',
+      entity: Author,
+      entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter({
-      relation_table: 'author',
-    })
-    _filter: unknown,
-    @Order({
-      relation_table: 'author',
-    })
-    _order: unknown,
+    @Filter(Author) _filter: unknown,
+    @Order(Author) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -137,26 +119,23 @@ export class AuthorResolver {
     @Loader({
       loader_type: ELoaderType.ONE_TO_MANY,
       field_name: 'books',
-      relation_table: 'book',
-      relation_fk: 'author_id',
+      entity: Book,
+      entity_fk_key: 'author_id',
+      entity_where: {
+        query: 'book.is_private = :is_private',
+        params: { is_private: false },
+      },
     })
     field_alias: string,
-    @Filter({
-      relation_table: 'book',
-    })
-    _filter: unknown,
-    @Order({
-      relation_table: 'book',
-    })
-    _order: unknown,
+    @Filter(Book) _filter: unknown,
+    @Order(Book) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
     return await ctx[field_alias].load(author.id);
   }
-}
 ```
 
-### GraphQL Query example
+#### Query
 
 ```graphql
 query {
@@ -170,6 +149,167 @@ query {
     books(ORDER: { created_at: { SORT: DESC } }) {
       id
       title
+    }
+  }
+}
+```
+
+### Polymorphic Example
+
+#### Entity
+
+```ts
+import { ID } from '@nestjs/graphql';
+
+import { Index, JoinColumn, ManyToOne } from 'typeorm';
+
+import { Field, ObjectType, PolymorphicColumn, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
+
+import { Section } from '../section/section.entity';
+
+@ObjectType()
+@Entity()
+export class Item {
+  @Field(() => ID, { filterable: true, sortable: true })
+  @PrimaryGeneratedColumn('uuid')
+  public id: string;
+
+  @Field(() => Date)
+  @CreateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public created_at: Date;
+
+  @Field(() => Date)
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+
+  @Field(() => ID, { filterable: true, sortable: true })
+  @Index()
+  @Column('uuid', { nullable: false })
+  public section_id: string;
+
+  @ManyToOne(() => Section, { nullable: false })
+  @JoinColumn({ name: 'section_id' })
+  public section: Section;
+
+  @Field(() => ID, { filterable: true, sortable: true })
+  @Index()
+  @Column('uuid', { nullable: false })
+  @PolymorphicColumn()
+  public itemable_id: string;
+
+  @Field(() => String, { filterable: true, sortable: true })
+  @Index()
+  @Column({ nullable: false })
+  @PolymorphicColumn()
+  public itemable_type: string;
+}
+```
+
+#### Union Type
+
+```ts
+import { createUnionType } from '@nestjs/graphql';
+
+import { ItemImage } from '../item-image/item-image.entity';
+import { ItemText } from '../item-text/item-text.entity';
+
+export const ItemableType = createUnionType({
+  name: 'ItemableType',
+  types: () => [ItemText, ItemImage],
+  resolveType(value) {
+    if (value instanceof ItemText) {
+      return ItemText;
+    } else if (value instanceof ItemImage) {
+      return ItemImage;
+    }
+  },
+});
+```
+
+#### Resolver
+
+```ts
+import { Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
+
+import { ItemText } from '../item-text/item-text.entity';
+import { ItemImage } from '../item-image/item-image.entity';
+
+import { Item } from './item.entity';
+import { ItemService } from './item.service';
+import { ItemableType } from './item.itemable';
+
+@Resolver(() => Item)
+export class ItemResolver {
+  constructor(private readonly itemService: ItemService) {}
+
+  @Query(() => [Item])
+  public async items(
+    @Loader({
+      loader_type: ELoaderType.MANY,
+      field_name: 'items',
+      entity: Item,
+      entity_fk_key: 'id',
+    })
+    field_alias: string,
+    @Filter(Item)
+    _filter: unknown,
+    @Order(Item)
+    _order: unknown,
+    @Pagination() _pagination: unknown,
+    @Context() ctx: GraphQLExecutionContext
+  ) {
+    return await ctx[field_alias];
+  }
+
+  @ResolveField(() => ItemableType, { nullable: true })
+  public async itemable(
+    @Parent() item: Item,
+    @Loader({
+      loader_type: ELoaderType.POLYMORPHIC,
+      field_name: 'itemable',
+      entity: ItemText || ItemImage,
+      entity_fk_key: 'id',
+      entity_fk_type: 'itemable_type',
+    })
+    field_alias: string,
+    @Context() ctx: GraphQLExecutionContext
+  ) {
+    return await ctx[field_alias].load(item.itemable_id);
+  }
+}
+```
+
+#### Query
+
+```graphql
+query {
+  items(
+    WHERE: { id: { NULL: false } }
+    ORDER: { id: { SORT: ASC } }
+    PAGINATION: { page: 0, per_page: 10 }
+  ) {
+    id
+    itemable_id
+    itemable_type
+    itemable {
+      __typename
+      ... on ItemText {
+        id
+        value
+      }
+      ... on ItemImage {
+        id
+        file_url
+        created_at
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { validateDTO } from '../../helpers/validate.helper';
+import { validateDTO } from '@helpers/validate.helper';
 
 import { PaginationInputType } from './decorator.pagination';
 

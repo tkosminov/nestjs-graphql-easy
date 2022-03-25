@@ -1,15 +1,12 @@
+import { Type } from '@nestjs/common';
 import { Args } from '@nestjs/graphql';
 
 import { buildFilter } from './builder.filter';
 
-export interface IFilterData {
-  relation_table: string;
-}
-
-export const Filter = (data: IFilterData) => {
+export const Filter = (enity: Type<any>) => {
   return Args({
     name: 'WHERE',
     nullable: true,
-    type: buildFilter(data),
+    type: buildFilter(enity),
   });
 };

@@ -6,19 +6,20 @@ import { IParsedPagination } from '../pagination/parser.pagination';
 import { ILoaderData } from './decorator.loader';
 
 export const manyLoader = (
-  selected_fields: Set<string>,
+  selected_columns: Set<string>,
+  entity_table_name: string,
   data: ILoaderData,
   filters: IParsedFilter | null,
   orders: OrderByCondition | null,
   paginations: IParsedPagination | null
 ) => {
-  const qb = getRepository(data.relation_table)
-    .createQueryBuilder(data.relation_table)
-    .select(Array.from(selected_fields).map((selected_field) => `${data.relation_table}.${selected_field}`))
-    .where(`${data.relation_table}.id IS NOT NULL`);
+  const qb = getRepository(entity_table_name)
+    .createQueryBuilder(entity_table_name)
+    .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
+    .where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`);
 
-  if (data.relation_where) {
-    qb.andWhere(data.relation_where.query, data.relation_where.params);
+  if (data.entity_where) {
+    qb.andWhere(data.entity_where.query, data.entity_where.params);
   }
 
   if (filters) {

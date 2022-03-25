@@ -1,15 +1,12 @@
+import { Type } from '@nestjs/common';
 import { Args } from '@nestjs/graphql';
 
 import { buildOrder } from './builder.order';
 
-export interface IOrderData {
-  relation_table: string;
-}
-
-export const Order = (data: IOrderData) => {
+export const Order = (enity: Type<any>) => {
   return Args({
     name: 'ORDER',
     nullable: true,
-    type: buildOrder(data),
+    type: buildOrder(enity),
   });
 };

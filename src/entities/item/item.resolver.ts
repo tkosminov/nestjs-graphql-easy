@@ -3,6 +3,10 @@ import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@n
 import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
 
 import { Book } from '../book/book.entity';
+import { Section } from '../section/section.entity';
+import { ItemText } from '../item-text/item-text.entity';
+import { ItemImage } from '../item-image/item-image.entity';
+
 import { Item } from './item.entity';
 import { ItemService } from './item.service';
 import { ItemableType } from './item.itemable';
@@ -16,17 +20,13 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'items',
-      relation_table: 'item',
-      relation_fk: 'id',
+      entity: Item,
+      entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter({
-      relation_table: 'item',
-    })
+    @Filter(Item)
     _filter: unknown,
-    @Order({
-      relation_table: 'item',
-    })
+    @Order(Item)
     _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
@@ -45,8 +45,8 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'section',
-      relation_table: 'section',
-      relation_fk: 'id',
+      entity: Section,
+      entity_fk_key: 'id',
     })
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext
@@ -60,8 +60,9 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.POLYMORPHIC,
       field_name: 'itemable',
-      // relation_table: 'section',
-      relation_fk: 'id',
+      entity: ItemText || ItemImage,
+      entity_fk_key: 'id',
+      entity_fk_type: 'itemable_type',
     })
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext

@@ -1,7 +1,6 @@
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
 
-import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination, middlewares, guards } from '@gql';
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
@@ -11,24 +10,17 @@ import { AuthorService } from './author.service';
 export class AuthorResolver {
   constructor(private readonly authorService: AuthorService) {}
 
-  @UseGuards(guards.auth)
   @Query(() => [Author])
   public async authors(
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'authors',
-      relation_table: 'author',
-      relation_fk: 'id',
+      entity: Author,
+      entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter({
-      relation_table: 'author',
-    })
-    _filter: unknown,
-    @Order({
-      relation_table: 'author',
-    })
-    _order: unknown,
+    @Filter(Author) _filter: unknown,
+    @Order(Author) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -40,28 +32,22 @@ export class AuthorResolver {
     return await this.authorService.findOne(id);
   }
 
-  @ResolveField(() => [Book], { nullable: true, middleware: [middlewares.role] })
+  @ResolveField(() => [Book], { nullable: true })
   public async books(
     @Parent() author: Author,
     @Loader({
       loader_type: ELoaderType.ONE_TO_MANY,
       field_name: 'books',
-      relation_table: 'book',
-      relation_fk: 'author_id',
-      relation_where: {
+      entity: Book,
+      entity_fk_key: 'author_id',
+      entity_where: {
         query: 'book.is_private = :is_private',
         params: { is_private: false },
       },
     })
     field_alias: string,
-    @Filter({
-      relation_table: 'book',
-    })
-    _filter: unknown,
-    @Order({
-      relation_table: 'book',
-    })
-    _order: unknown,
+    @Filter(Book) _filter: unknown,
+    @Order(Book) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
     return await ctx[field_alias].load(author.id);

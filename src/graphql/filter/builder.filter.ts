@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-
+import { Type } from '@nestjs/common';
 import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
-import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store';
-
-import { capitalize } from '../../helpers/string.helper';
-
-import { IFilterData } from './decorator.filter';
+import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store/graphql';
 
 export enum EFilterOperator {
   AND = 'AND',
@@ -95,16 +91,16 @@ const buildFilterField = (column: IField): ReturnTypeFunc => {
   return () => field_input_type;
 };
 
-export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
-  const table_name = capitalize(data.relation_table);
+export const buildFilter = (enity: Type<any>): ReturnTypeFunc => {
+  const entity_class_name = enity.name;
 
-  if (where_input_types.has(table_name)) {
-    return where_input_types.get(table_name);
+  if (where_input_types.has(entity_class_name)) {
+    return where_input_types.get(entity_class_name);
   }
 
   const where_input_type = function whereInputType() {};
 
-  gql_fields.get(table_name).forEach((col) => {
+  gql_fields.get(entity_class_name).forEach((col) => {
     if (col.options?.filterable) {
       decorateField(where_input_type, col.name, buildFilterField(col));
     }
@@ -115,12 +111,12 @@ export const buildFilter = (data: IFilterData): ReturnTypeFunc => {
   });
 
   Object.defineProperty(where_input_type, 'name', {
-    value: `${table_name}FilterInputType`,
+    value: `${entity_class_name}_FilterInputType`,
   });
 
   InputType()(where_input_type);
 
-  where_input_types.set(table_name, () => where_input_type);
+  where_input_types.set(entity_class_name, () => where_input_type);
 
   return () => where_input_type;
 };

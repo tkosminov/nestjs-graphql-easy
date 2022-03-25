@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-
+import { Type } from '@nestjs/common';
 import { InputType, registerEnumType, ReturnTypeFunc } from '@nestjs/graphql';
 
-import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store';
-
-import { capitalize } from '../../helpers/string.helper';
-
-import { IOrderData } from './decorator.order';
+import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store/graphql';
 
 export enum EOrderQuery {
   SORT = 'SORT',
@@ -59,16 +55,16 @@ const buildOrderField = (_column: IField): ReturnTypeFunc => {
   return () => field_input_type;
 };
 
-export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
-  const table_name = capitalize(data.relation_table);
+export const buildOrder = (enity: Type<any>): ReturnTypeFunc => {
+  const entity_class_name = enity.name;
 
-  if (order_input_types.has(table_name)) {
-    return order_input_types.get(table_name);
+  if (order_input_types.has(entity_class_name)) {
+    return order_input_types.get(entity_class_name);
   }
 
   const order_input_type = function orderInputType() {};
 
-  gql_fields.get(table_name).forEach((col) => {
+  gql_fields.get(entity_class_name).forEach((col) => {
     if (col.options?.sortable) {
       decorateField(order_input_type, col.name, buildOrderField(col), {
         nullable: true,
@@ -77,12 +73,12 @@ export const buildOrder = (data: IOrderData): ReturnTypeFunc => {
   });
 
   Object.defineProperty(order_input_type, 'name', {
-    value: `${table_name}OrderInputType`,
+    value: `${entity_class_name}_OrderInputType`,
   });
 
   InputType()(order_input_type);
 
-  order_input_types.set(table_name, () => order_input_type);
+  order_input_types.set(entity_class_name, () => order_input_type);
 
   return () => order_input_type;
 };

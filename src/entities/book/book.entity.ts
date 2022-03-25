@@ -1,18 +1,8 @@
 import { ID } from '@nestjs/graphql';
 
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
-import { Field, ObjectType } from '@gql';
+import { Field, ObjectType, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
 
 import { Author } from '../author/author.entity';
 import { Section } from '../section/section.entity';

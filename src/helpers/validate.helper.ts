@@ -1,7 +1,7 @@
 import { ClassConstructor, plainToClass } from 'class-transformer';
 import { validateSync, ValidationError } from 'class-validator';
 
-import { bad_request } from '../errors';
+import { bad_request } from '@errors';
 
 export function validateDTO(type: ClassConstructor<unknown>, value: unknown) {
   const errors: ValidationError[] = validateSync(plainToClass(type, value) as object, { skipMissingProperties: true });

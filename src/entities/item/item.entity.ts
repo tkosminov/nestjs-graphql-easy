@@ -1,8 +1,8 @@
 import { ID } from '@nestjs/graphql';
 
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Index, JoinColumn, ManyToOne } from 'typeorm';
 
-import { Field, ObjectType, Polymorphic } from '@gql';
+import { Field, ObjectType, PolymorphicColumn, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
 
 import { Section } from '../section/section.entity';
 
@@ -39,12 +39,12 @@ export class Item {
   @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
-  @Polymorphic()
+  @PolymorphicColumn()
   public itemable_id: string;
 
   @Field(() => String, { filterable: true, sortable: true })
   @Index()
   @Column({ nullable: false })
-  @Polymorphic()
+  @PolymorphicColumn()
   public itemable_type: string;
 }

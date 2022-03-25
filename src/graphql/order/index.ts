@@ -1,2 +1,2 @@
-export { Order, IOrderData } from './decorator.order';
+export { Order } from './decorator.order';
 export { parseOrder } from './parser.order';

@@ -1,36 +1,29 @@
 import Dataloader from 'dataloader';
 import { getRepository, OrderByCondition } from 'typeorm';
 
-import { capitalize } from '../../helpers/string.helper';
-import { groupBy } from '../../helpers/array.helper';
+import { groupBy } from '@helpers/array.helper';
+
 import { IParsedFilter } from '../filter/parser.filter';
-import { getTableFks } from '../store';
 
 import { ILoaderData } from './decorator.loader';
 
 export const oneToManyLoader = (
-  selected_fields: Set<string>,
+  selected_columns: Set<string>,
+  entity_table_name: string,
   data: ILoaderData,
   filters: IParsedFilter | null,
   orders: OrderByCondition | null
 ) => {
   return new Dataloader(async (keys: Array<string | number>) => {
-    selected_fields.add('id');
-    selected_fields.add(data.relation_fk);
-
-    getTableFks(capitalize(data.relation_table)).forEach((col) => {
-      selected_fields.add(col);
-    });
-
-    const qb = getRepository(data.relation_table)
-      .createQueryBuilder(data.relation_table)
-      .select(Array.from(selected_fields).map((selected_field) => `${data.relation_table}.${selected_field}`))
-      .where(`${data.relation_table}.${data.relation_fk} IN (:...keys)`, {
+    const qb = getRepository(entity_table_name)
+      .createQueryBuilder(entity_table_name)
+      .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
+      .where(`${entity_table_name}.${data.entity_fk_key} IN (:...keys)`, {
         keys,
       });
 
-    if (data.relation_where) {
-      qb.andWhere(data.relation_where.query, data.relation_where.params);
+    if (data.entity_where) {
+      qb.andWhere(data.entity_where.query, data.entity_where.params);
     }
 
     if (filters) {
@@ -43,7 +36,7 @@ export const oneToManyLoader = (
 
     const poll_options = await qb.getMany();
 
-    const gs = groupBy(poll_options, data.relation_fk);
+    const gs = groupBy(poll_options, data.entity_fk_key);
 
     return keys.map((k) => gs[k]);
   });
