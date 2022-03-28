@@ -259,10 +259,8 @@ export class ItemResolver {
       entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter(Item)
-    _filter: unknown,
-    @Order(Item)
-    _order: unknown,
+    @Filter(Item) _filter: unknown,
+    @Order(Item) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
