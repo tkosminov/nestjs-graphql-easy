@@ -4,7 +4,7 @@ import { createParamDecorator, ExecutionContext, Type } from '@nestjs/common';
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
 import { OrderByCondition } from 'typeorm';
 
-import { underscore } from '@helpers/string.helper';
+import { underscore } from '../helper';
 
 import { IFilterValue, IParsedFilter, parseFilter } from '../filter/parser.filter';
 import { IOrderValue, parseOrder } from '../order/parser.order';

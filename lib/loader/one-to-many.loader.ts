@@ -1,8 +1,7 @@
 import Dataloader from 'dataloader';
 import { getRepository, OrderByCondition } from 'typeorm';
 
-import { groupBy } from '@helpers/array.helper';
-
+import { groupBy } from '../helper';
 import { IParsedFilter } from '../filter/parser.filter';
 
 import { ILoaderData } from './decorator.loader';

@@ -1,7 +1,7 @@
 import Dataloader from 'dataloader';
 import { getRepository } from 'typeorm';
 
-import { reduceToObject } from '@helpers/array.helper';
+import { reduceToObject } from '../helper';
 
 import { ILoaderData } from './decorator.loader';
 

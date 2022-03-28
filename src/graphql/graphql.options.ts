@@ -6,9 +6,8 @@ import { GraphQLError, GraphQLSchema } from 'graphql';
 import config from 'config';
 import { Request } from 'express';
 
-import { LoggerStore } from '@logger/logger.store';
-
-import { corsOptionsDelegate } from '../../cors.options';
+import { LoggerStore } from '../logger/logger.store';
+import { corsOptionsDelegate } from '../cors.options';
 
 const appSettings = config.get<IAppSettings>('APP_SETTINGS');
 const graphqlSettings = config.get<IGraphqlSettings>('GRAPHQL_SETTINGS');

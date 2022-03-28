@@ -13,23 +13,23 @@
     "esModuleInterop": true,
     "target": "ES2019",
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": ".",
+    "outDir": "./dist-lib",
+    "baseUrl": "lib",
     "typeRoots": [
-      "./node_modules/@types",
-      "./types"
+      "node_modules/@types",
+      "types"
     ],
     "paths": {
-      "@helpers/*": ["./src/helpers/*"],
-      "@errors": ["./src/errors/index"],
       "@gql": ["./lib/index"]
     }
   },
   "exclude": [
     ".git",
     ".vscode",
+    "config",
     "dist",
     "dist-lib",
-    "node_modules"
+    "node_modules",
+    "src"
   ]
 }

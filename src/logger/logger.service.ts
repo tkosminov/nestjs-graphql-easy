@@ -3,15 +3,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import config from 'config';
 
 export enum ELogLevel {
-  debug,
-  info,
-  warn,
-  error,
+  debug = 'debug',
+  info = 'info',
+  warn = 'warn',
+  error = 'error',
 }
+
+const log_level = config.get<ILogSettings>('LOGGER_SETTINGS').level;
 
 @Injectable()
 export class LoggerService extends Logger {
-  private readonly _current_level: ELogLevel = ELogLevel[config.get<ILogSettings>('LOGGER_SETTINGS').level];
+  private readonly _current_level: ELogLevel = ELogLevel[log_level];
 
   constructor(private readonly _context?: string) {
     super(_context);
