@@ -216,13 +216,13 @@ export class Item {
   @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
-  @PolymorphicColumn()
+  @PolymorphicColumn() // <-- add
   public itemable_id: string;
 
   @Field(() => String, { filterable: true, sortable: true })
   @Index()
   @Column({ nullable: false })
-  @PolymorphicColumn()
+  @PolymorphicColumn() // <-- add
   public itemable_type: string;
 }
 ```
@@ -263,10 +263,7 @@ import {
   Pagination
 } from 'nestjs-graphql-easy';
 
-import { Book } from '../book/book.entity';
 import { Section } from '../section/section.entity';
-import { ItemText } from '../item-text/item-text.entity';
-import { ItemImage } from '../item-image/item-image.entity';
 
 import { Item } from './item.entity';
 import { ItemService } from './item.service';
@@ -292,7 +289,7 @@ export class ItemResolver {
     return await ctx[field_alias];
   }
 
-  @ResolveField(() => Book, { nullable: false })
+  @ResolveField(() => Section, { nullable: false })
   public async section(
     @Parent() item: Item,
     @Loader({
@@ -302,7 +299,7 @@ export class ItemResolver {
       entity_fk_key: 'id',
     }) field_alias: string,
     @Context() ctx: GraphQLExecutionContext
-  ): Promise<Book> {
+  ): Promise<Section> {
     return await ctx[field_alias].load(item.section_id);
   }
 

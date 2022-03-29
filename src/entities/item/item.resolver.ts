@@ -2,10 +2,7 @@ import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@n
 
 import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from 'nestjs-graphql-easy';
 
-import { Book } from '../book/book.entity';
 import { Section } from '../section/section.entity';
-import { ItemText } from '../item-text/item-text.entity';
-import { ItemImage } from '../item-image/item-image.entity';
 
 import { Item } from './item.entity';
 import { ItemService } from './item.service';
@@ -37,7 +34,7 @@ export class ItemResolver {
     return await this.itemService.findOne(id);
   }
 
-  @ResolveField(() => Book, { nullable: false })
+  @ResolveField(() => Section, { nullable: false })
   public async section(
     @Parent() item: Item,
     @Loader({
@@ -48,7 +45,7 @@ export class ItemResolver {
     })
     field_alias: string,
     @Context() ctx: GraphQLExecutionContext
-  ): Promise<Book> {
+  ): Promise<Section> {
     return await ctx[field_alias].load(item.section_id);
   }
 
