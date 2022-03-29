@@ -11,6 +11,15 @@
     "dist-lib",
     "lib"
   ],
+  "keywords": [
+    "graphql",
+    "nestjs",
+    "dataloader",
+    "polymorphic"
+  ],
+  "repository": {
+    "url": "https://github.com/TimurRK/nestjs-graphql-easy"
+  },
   "scripts": {
     "build": "rimraf dist-lib && tsc -p tsconfig.lib.json",
     "start:debug": "nodemon --config nodemon-debug.json",
