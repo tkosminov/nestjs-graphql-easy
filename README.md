@@ -26,7 +26,8 @@ Important!
 
 * Points 2 and 3 are caused by the fact that it is necessary to collect data for auto-generation of filters and sorts, as well as not to deal with casting the names `graphql field <-> class property <-> typeorm column` and `graphql object <-> class name < -> typeorm table` (imported decorators from `nestjs-graphql-easy` removed the ability to set a name)
 
-4. Decorators `Filter`, `Order` and `Pagination` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY` and `ELoaderType.ONE_TO_MANY`
+4. Decorators `Filter`, `Order` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY` and `ELoaderType.ONE_TO_MANY`
+5. Decorators `Pagination` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY`
 
 ### Entity/Object basic example
 
