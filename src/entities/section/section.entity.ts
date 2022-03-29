@@ -2,7 +2,7 @@ import { ID } from '@nestjs/graphql';
 
 import { Index, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
-import { Field, ObjectType, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
+import { Field, ObjectType, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
 import { SectionTitle } from '../section-title/section-title.entity';

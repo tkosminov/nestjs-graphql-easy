@@ -1,6 +1,6 @@
 import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
-import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
+import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from 'nestjs-graphql-easy';
 
 import { SectionTitle } from './section-title.entity';
 import { SectionTitleService } from './section-title.service';

@@ -8,45 +8,41 @@
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-# NestJS-GraphQL-Example
-
-## Inspired
-
-* https://github.com/sulthanmamusa/graphql-dataloader
-* https://github.com/Mando75/typeorm-graphql-loader
-* https://github.com/slaypni/type-graphql-dataloader
+# NestJS-GraphQL-Easy
 
 ## Installation
 
-### Dependencies
-
-* PostgreSQL 13+
-* NodeJS 14+
-
-### Installation
-
 ```bash
-npm ci
+npm i nestjs-graphql-easy
 ```
 
-### DB Settings
+## Usage
 
-sudo -i -u postgres
+Important!
 
-createdb ${env}_nestjs_graphql_template
+1. The typeorm model and the graphql object must be the same class.
+2. Decorators `PolymorphicColumn`, `Column`, `Entity`, `CreateDateColumn`, `UpdateDateColumn`, `PrimaryColumn`, `PrimaryGeneratedColumn` from `typeorm` must be imported from `nestjs-graphql-easy`
+3. Decorators `Field` (only for columns from tables), `ObjectType`, `Query`, `Mutation`, `ResolveField` from `graphql` must be imported from `nestjs-graphql-easy`
 
-## GraphQL
+* Points 2 and 3 are caused by the fact that it is necessary to collect data for auto-generation of filters and sorts, as well as not to deal with casting the names `graphql field <-> class property <-> typeorm column` and `graphql object <-> class name < -> typeorm table` (imported decorators from `nestjs-graphql-easy` removed the ability to set a name)
 
-### Basic Example
+4. Decorators `Filter`, `Order` and `Pagination` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY` and `ELoaderType.ONE_TO_MANY`
 
-#### Entity
+### Entity/Object basic example
 
 ```ts
 import { ID } from '@nestjs/graphql';
 
 import { Index, OneToMany } from 'typeorm';
-
-import { ObjectType, Field, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
+import {
+  ObjectType,
+  Field,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn
+} from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
 
@@ -81,12 +77,20 @@ export class Author {
 }
 ```
 
-#### Resolver
+### Resolver basic example
 
 ```ts
 import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 
-import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
+import {
+  Query,
+  ResolveField,
+  ELoaderType,
+  Loader,
+  Filter,
+  Order,
+  Pagination
+} from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
@@ -103,8 +107,7 @@ export class AuthorResolver {
       field_name: 'authors',
       entity: Author,
       entity_fk_key: 'id',
-    })
-    field_alias: string,
+    }) field_alias: string,
     @Filter(Author) _filter: unknown,
     @Order(Author) _order: unknown,
     @Pagination() _pagination: unknown,
@@ -125,17 +128,17 @@ export class AuthorResolver {
         query: 'book.is_private = :is_private',
         params: { is_private: false },
       },
-    })
-    field_alias: string,
+    }) field_alias: string,
     @Filter(Book) _filter: unknown,
     @Order(Book) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Book[]> {
     return await ctx[field_alias].load(author.id);
   }
+}
 ```
 
-#### Query
+### Query basic example
 
 ```graphql
 query {
@@ -154,16 +157,23 @@ query {
 }
 ```
 
-### Polymorphic Example
-
-#### Entity
+### Entity/Object with polymorphic relation example
 
 ```ts
 import { ID } from '@nestjs/graphql';
 
 import { Index, JoinColumn, ManyToOne } from 'typeorm';
 
-import { Field, ObjectType, PolymorphicColumn, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from '@gql';
+import {
+  Field,
+  ObjectType,
+  PolymorphicColumn,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn
+} from 'nestjs-graphql-easy';
 
 import { Section } from '../section/section.entity';
 
@@ -211,7 +221,7 @@ export class Item {
 }
 ```
 
-#### Union Type
+### Polymorphic union type example
 
 ```ts
 import { createUnionType } from '@nestjs/graphql';
@@ -232,13 +242,23 @@ export const ItemableType = createUnionType({
 });
 ```
 
-#### Resolver
+### Resolver with polymorphic relation example
 
 ```ts
-import { Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
 
-import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from '@gql';
+import {
+  Query,
+  ResolveField,
+  ELoaderType,
+  Loader,
+  Filter,
+  Order,
+  Pagination
+} from 'nestjs-graphql-easy';
 
+import { Book } from '../book/book.entity';
+import { Section } from '../section/section.entity';
 import { ItemText } from '../item-text/item-text.entity';
 import { ItemImage } from '../item-image/item-image.entity';
 
@@ -257,14 +277,27 @@ export class ItemResolver {
       field_name: 'items',
       entity: Item,
       entity_fk_key: 'id',
-    })
-    field_alias: string,
+    }) field_alias: string,
     @Filter(Item) _filter: unknown,
     @Order(Item) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
+  }
+
+  @ResolveField(() => Book, { nullable: false })
+  public async section(
+    @Parent() item: Item,
+    @Loader({
+      loader_type: ELoaderType.MANY_TO_ONE,
+      field_name: 'section',
+      entity: Section,
+      entity_fk_key: 'id',
+    }) field_alias: string,
+    @Context() ctx: GraphQLExecutionContext
+  ): Promise<Book> {
+    return await ctx[field_alias].load(item.section_id);
   }
 
   @ResolveField(() => ItemableType, { nullable: true })
@@ -276,8 +309,7 @@ export class ItemResolver {
       entity: ItemText || ItemImage,
       entity_fk_key: 'id',
       entity_fk_type: 'itemable_type',
-    })
-    field_alias: string,
+    }) field_alias: string,
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias].load(item.itemable_id);
@@ -285,7 +317,7 @@ export class ItemResolver {
 }
 ```
 
-#### Query
+### Query with polymorphic relation example
 
 ```graphql
 query {
