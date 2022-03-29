@@ -18,12 +18,12 @@ export class SectionResolver {
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'sections',
-      entity: Section,
+      entity: () => Section,
       entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter(Section) _filter: unknown,
-    @Order(Section) _order: unknown,
+    @Filter(() => Section) _filter: unknown,
+    @Order(() => Section) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -41,7 +41,7 @@ export class SectionResolver {
     @Loader({
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'book',
-      entity: Book,
+      entity: () => Book,
       entity_fk_key: 'id',
     })
     field_alias: string,
@@ -56,7 +56,7 @@ export class SectionResolver {
     @Loader({
       loader_type: ELoaderType.ONE_TO_ONE,
       field_name: 'section_title',
-      entity: SectionTitle,
+      entity: () => SectionTitle,
       entity_fk_key: 'section_id',
     })
     field_alias: string,
@@ -71,12 +71,12 @@ export class SectionResolver {
     @Loader({
       loader_type: ELoaderType.ONE_TO_MANY,
       field_name: 'items',
-      entity: Item,
+      entity: () => Item,
       entity_fk_key: 'section_id',
     })
     field_alias: string,
-    @Filter(Item) _filter: unknown,
-    @Order(Item) _order: unknown,
+    @Filter(() => Item) _filter: unknown,
+    @Order(() => Item) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Section[]> {
     return await ctx[field_alias].load(section.id);

@@ -16,12 +16,12 @@ export class SectionTitleResolver {
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'section_titles',
-      entity: SectionTitle,
+      entity: () => SectionTitle,
       entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter(SectionTitle) _filter: unknown,
-    @Order(SectionTitle) _order: unknown,
+    @Filter(() => SectionTitle) _filter: unknown,
+    @Order(() => SectionTitle) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -34,7 +34,7 @@ export class SectionTitleResolver {
     @Loader({
       loader_type: ELoaderType.ONE_TO_ONE,
       field_name: 'section',
-      entity: Section,
+      entity: () => Section,
       entity_fk_key: 'id',
     })
     field_alias: string,

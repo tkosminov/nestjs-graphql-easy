@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Type } from '@nestjs/common';
 import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
 import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store/graphql';
@@ -91,8 +90,8 @@ const buildFilterField = (column: IField): ReturnTypeFunc => {
   return () => field_input_type;
 };
 
-export const buildFilter = (enity: Type<any>): ReturnTypeFunc => {
-  const entity_class_name = enity.name;
+export const buildFilter = (enity: ReturnTypeFunc): ReturnTypeFunc => {
+  const entity_class_name = enity()['name'];
 
   if (where_input_types.has(entity_class_name)) {
     return where_input_types.get(entity_class_name);

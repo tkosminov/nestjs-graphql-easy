@@ -20,12 +20,12 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'items',
-      entity: Item,
+      entity: () => Item,
       entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter(Item) _filter: unknown,
-    @Order(Item) _order: unknown,
+    @Filter(() => Item) _filter: unknown,
+    @Order(() => Item) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -43,7 +43,7 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'section',
-      entity: Section,
+      entity: () => Section,
       entity_fk_key: 'id',
     })
     field_alias: string,
@@ -58,7 +58,7 @@ export class ItemResolver {
     @Loader({
       loader_type: ELoaderType.POLYMORPHIC,
       field_name: 'itemable',
-      entity: ItemText || ItemImage,
+      entity: () => ItemableType,
       entity_fk_key: 'id',
       entity_fk_type: 'itemable_type',
     })

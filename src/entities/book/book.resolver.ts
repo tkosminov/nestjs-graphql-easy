@@ -16,12 +16,12 @@ export class BookResolver {
     @Loader({
       loader_type: ELoaderType.MANY,
       field_name: 'books',
-      entity: Book,
+      entity: () => Book,
       entity_fk_key: 'id',
     })
     field_alias: string,
-    @Filter(Book) _filter: unknown,
-    @Order(Book) _order: unknown,
+    @Filter(() => Book) _filter: unknown,
+    @Order(() => Book) _order: unknown,
     @Pagination() _pagination: unknown,
     @Context() ctx: GraphQLExecutionContext
   ) {
@@ -39,7 +39,7 @@ export class BookResolver {
     @Loader({
       loader_type: ELoaderType.MANY_TO_ONE,
       field_name: 'author',
-      entity: Author,
+      entity: () => Author,
       entity_fk_key: 'id',
     })
     field_alias: string,
@@ -54,12 +54,12 @@ export class BookResolver {
     @Loader({
       loader_type: ELoaderType.ONE_TO_MANY,
       field_name: 'sections',
-      entity: Section,
+      entity: () => Section,
       entity_fk_key: 'book_id',
     })
     field_alias: string,
-    @Filter(Section) _filter: unknown,
-    @Order(Section) _order: unknown,
+    @Filter(() => Section) _filter: unknown,
+    @Order(() => Section) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
   ): Promise<Section[]> {
     return await ctx[field_alias].load(book.id);

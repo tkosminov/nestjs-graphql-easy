@@ -1,10 +1,10 @@
 {
   "name": "nestjs-graphql-easy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "author": "t.kosminov",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "main": "dist-lib/index.js",
   "types": "dist-lib/index.d.ts",
   "files": [

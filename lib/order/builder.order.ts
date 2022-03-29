@@ -55,8 +55,8 @@ const buildOrderField = (_column: IField): ReturnTypeFunc => {
   return () => field_input_type;
 };
 
-export const buildOrder = (enity: Type<any>): ReturnTypeFunc => {
-  const entity_class_name = enity.name;
+export const buildOrder = (enity: ReturnTypeFunc): ReturnTypeFunc => {
+  const entity_class_name = enity()['name'];
 
   if (order_input_types.has(entity_class_name)) {
     return order_input_types.get(entity_class_name);

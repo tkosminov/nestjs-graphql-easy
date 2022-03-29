@@ -1,9 +1,8 @@
-import { Type } from '@nestjs/common';
-import { Args } from '@nestjs/graphql';
+import { Args, ReturnTypeFunc } from '@nestjs/graphql';
 
 import { buildOrder } from './builder.order';
 
-export const Order = (enity: Type<any>) => {
+export const Order = (enity: ReturnTypeFunc) => {
   return Args({
     name: 'ORDER',
     nullable: true,

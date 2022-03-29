@@ -1,4 +1,4 @@
-import { GraphQLExecutionContext } from '@nestjs/graphql';
+import { GraphQLExecutionContext, ReturnTypeFunc } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext, Type } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
@@ -25,7 +25,7 @@ export enum ELoaderType {
 }
 
 export interface ILoaderData {
-  entity: Type<any>;
+  entity: ReturnTypeFunc;
   entity_fk_key: string;
   entity_fk_type?: string;
   loader_type: ELoaderType;
@@ -49,7 +49,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   if (data.loader_type === ELoaderType.POLYMORPHIC) {
     entity_class_name = parent[data.entity_fk_type] as string;
   } else {
-    entity_class_name = data.entity.name;
+    entity_class_name = data.entity()['name'];
   }
 
   const entity_table_name = underscore(entity_class_name);
