@@ -18,7 +18,7 @@ npm i nestjs-graphql-easy
 
 ## Usage
 
-Important!
+### Important!
 
 1. The typeorm model and the graphql object must be the same class.
 2. Decorators `PolymorphicColumn`, `Column`, `Entity`, `CreateDateColumn`, `UpdateDateColumn`, `PrimaryColumn`, `PrimaryGeneratedColumn` from `typeorm` must be imported from `nestjs-graphql-easy`
@@ -28,6 +28,11 @@ Important!
 
 4. Decorators `Filter`, `Order` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY` and `ELoaderType.ONE_TO_MANY`
 5. Decorators `Pagination` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY`
+
+### Dependencies!
+
+1. NestJS 8
+2. TypeORM
 
 ### Entity/Object basic example
 
