@@ -23,7 +23,6 @@
   },
   "scripts": {
     "build": "rimraf dist-lib && tsc -p tsconfig.lib.json",
-    "publish": "npm run build && npm publish",
     "start:debug": "nodemon --config nodemon-debug.json",
     "start:dev": "nodemon",
     "build:dev": "rimraf dist && tsc -p tsconfig.build.json",
