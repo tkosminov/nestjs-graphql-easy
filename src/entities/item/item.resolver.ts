@@ -31,7 +31,7 @@ export class ItemResolver {
 
   @Query(() => Item)
   public async item(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.itemService.findOne(id);
+    return await this.itemService.findOne({ where: { id } });
   }
 
   @ResolveField(() => Section, { nullable: false })

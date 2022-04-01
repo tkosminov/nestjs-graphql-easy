@@ -1,4 +1,4 @@
-import { DeepPartial, FindConditions, FindManyOptions, FindOneOptions, RemoveOptions, Repository, SaveOptions } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, RemoveOptions, Repository, SaveOptions } from 'typeorm';
 
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
@@ -11,16 +11,8 @@ export class ServiceHelper<T> {
     return await this.repository.find(options);
   }
 
-  public async findOne(id: id, options: FindOneOptions<T> = {}) {
-    return await this.repository.findOne(id, options);
-  }
-
-  public async findOneBy(where: FindConditions<T>, relations: string[] = []) {
-    return await this.repository.findOne({ where, relations });
-  }
-
-  public async findByIds(ids: id[], options: FindManyOptions<T> = {}) {
-    return await this.repository.findByIds(ids, options);
+  public async findOne(options: FindOneOptions<T> = {}) {
+    return await this.repository.findOne(options);
   }
 
   public async newModel(model: DeepPartial<T>) {
@@ -29,25 +21,20 @@ export class ServiceHelper<T> {
 
   public async create(model: DeepPartial<T>, options: SaveOptions = {}) {
     const result = this.repository.create(model);
+
     return await this.save(result, options);
   }
 
-  public async update(id: id, partial: QueryDeepPartialEntity<T>, options: FindOneOptions<T> = {}) {
+  public async update(id: id, partial: QueryDeepPartialEntity<T>) {
     await this.repository.update(id, partial);
-
-    return await this.findOne(id, options);
   }
 
   public async save(model: T, options: SaveOptions = {}) {
     return await this.repository.save(model as DeepPartial<T>, options);
   }
 
-  public async delete(id: id, options: FindOneOptions<T> = {}) {
-    const model = this.repository.findOne(id, options);
-
-    await this.repository.delete(id);
-
-    return model;
+  public async delete(id: id) {
+    return await this.repository.delete(id);
   }
 
   public async remove(models: T[], options: RemoveOptions = {}) {

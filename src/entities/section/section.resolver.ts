@@ -32,7 +32,7 @@ export class SectionResolver {
 
   @Query(() => Section)
   public async section(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.sectionService.findOne(id);
+    return await this.sectionService.findOne({ where: { id } });
   }
 
   @ResolveField(() => Book, { nullable: false })

@@ -29,7 +29,7 @@ export class AuthorResolver {
 
   @Query(() => Author)
   public async author(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.authorService.findOne(id);
+    return await this.authorService.findOne({ where: { id } });
   }
 
   @ResolveField(() => [Book], { nullable: true })

@@ -30,7 +30,7 @@ export class BookResolver {
 
   @Query(() => Book)
   public async book(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.bookService.findOne(id);
+    return await this.bookService.findOne({ where: { id } });
   }
 
   @ResolveField(() => Author, { nullable: false })
