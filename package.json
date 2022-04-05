@@ -65,7 +65,6 @@
     "config": "^3.3.7",
     "cookie-parser": "^1.4.6",
     "body-parser": "^1.19.2",
-    "@nestjs/cli": "^8.2.4",
     "@nestjs/schematics": "^8.0.8",
     "@nestjs/testing": "^8.4.3",
     "@types/body-parser": "^1.19.2",
