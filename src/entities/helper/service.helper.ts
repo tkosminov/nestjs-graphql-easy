@@ -1,4 +1,4 @@
-import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, RemoveOptions, Repository, SaveOptions } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, RemoveOptions, Repository, SaveOptions } from 'typeorm';
 
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 

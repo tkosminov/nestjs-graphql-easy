@@ -1,7 +1,9 @@
-import { DataSource } from 'typeorm';
+import { ConnectionOptions } from 'typeorm';
 
 import { getOrmConfig } from './database-ormconfig.constant';
 
-export default new DataSource({
+const database_connection_test_configuration: Partial<ConnectionOptions> = {
   ...getOrmConfig(),
-});
+};
+
+export = database_connection_test_configuration;
