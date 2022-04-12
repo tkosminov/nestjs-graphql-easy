@@ -18,7 +18,7 @@ export const oneToManyLoader = (
       .getRepository(entity_table_name)
       .createQueryBuilder(entity_table_name)
       .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`));
-    
+
     if (data.entity_joins?.length) {
       for (const join of data.entity_joins) {
         qb.innerJoin(join.query, join.alias);

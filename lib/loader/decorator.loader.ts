@@ -34,7 +34,7 @@ export interface ILoaderData {
   entity_joins?: Array<{
     query: string;
     alias: string;
-  }>,
+  }>;
   entity_wheres?: Array<{
     query: string;
     params?: Record<string, unknown>;

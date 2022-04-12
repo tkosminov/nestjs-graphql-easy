@@ -25,8 +25,8 @@ export const manyLoader = (
 
     qb.distinct();
   }
-    
-  qb.where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`)
+
+  qb.where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`);
 
   if (data.entity_wheres?.length) {
     for (const where of data.entity_wheres) {

@@ -133,8 +133,8 @@ export class AuthorResolver {
       entity_joins: [
         {
           query: 'book.author',
-          alias: 'author'
-        }
+          alias: 'author',
+        },
       ],
       entity_wheres: [
         {
@@ -142,10 +142,11 @@ export class AuthorResolver {
           params: { is_private: false },
         },
         {
-          query: 'author.id IS NOT NULL'
-        }
+          query: 'author.id IS NOT NULL',
+        },
       ],
-    }) field_alias: string,
+    })
+    field_alias: string,
     @Filter(() => Book) _filter: unknown,
     @Order(() => Book) _order: unknown,
     @Context() ctx: GraphQLExecutionContext
