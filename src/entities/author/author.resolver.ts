@@ -40,12 +40,22 @@ export class AuthorResolver {
       field_name: 'books',
       entity: () => Book,
       entity_fk_key: 'author_id',
-      entity_where: {
-        query: 'book.is_private = :is_private',
-        params: { is_private: false },
-      },
-    })
-    field_alias: string,
+      entity_joins: [
+        {
+          query: 'book.author',
+          alias: 'author'
+        }
+      ],
+      entity_wheres: [
+        {
+          query: 'book.is_private = :is_private',
+          params: { is_private: false },
+        },
+        {
+          query: 'author.id IS NOT NULL'
+        }
+      ],
+    }) field_alias: string,
     @Filter(() => Book) _filter: unknown,
     @Order(() => Book) _order: unknown,
     @Context() ctx: GraphQLExecutionContext

@@ -1,6 +1,6 @@
 {
   "name": "nestjs-graphql-easy",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "A library for NestJS that implements a dataloader (including for polymorphic relation) for graphql, as well as automatic generation of arguments for filters, sorting and pagination, and their processing in the dataloader.",
   "author": "t.kosminov",
   "license": "MIT",

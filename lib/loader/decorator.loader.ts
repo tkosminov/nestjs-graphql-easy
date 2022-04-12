@@ -25,16 +25,20 @@ export enum ELoaderType {
 }
 
 export interface ILoaderData {
+  field_name: string;
+  loader_type: ELoaderType;
   entity: ReturnTypeFunc;
   entity_fk_key: string;
   entity_fk_type?: string;
   entity_manager?: EntityManager;
-  loader_type: ELoaderType;
-  field_name: string;
-  entity_where?: {
+  entity_joins?: Array<{
+    query: string;
+    alias: string;
+  }>,
+  entity_wheres?: Array<{
     query: string;
     params?: Record<string, unknown>;
-  };
+  }>;
 }
 
 export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {

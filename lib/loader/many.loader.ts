@@ -1,4 +1,4 @@
-import { EntityManager, getConnection, OrderByCondition } from 'typeorm';
+import { OrderByCondition } from 'typeorm';
 
 import { IParsedFilter } from '../filter/parser.filter';
 import { IParsedPagination } from '../pagination/parser.pagination';
@@ -16,11 +16,22 @@ export const manyLoader = (
   const qb = data.entity_manager
     .getRepository(entity_table_name)
     .createQueryBuilder(entity_table_name)
-    .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
-    .where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`);
+    .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`));
 
-  if (data.entity_where) {
-    qb.andWhere(data.entity_where.query, data.entity_where.params);
+  if (data.entity_joins?.length) {
+    for (const join of data.entity_joins) {
+      qb.innerJoin(join.query, join.alias);
+    }
+
+    qb.distinct();
+  }
+    
+  qb.where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`)
+
+  if (data.entity_wheres?.length) {
+    for (const where of data.entity_wheres) {
+      qb.andWhere(where.query, where.params);
+    }
   }
 
   if (filters) {
