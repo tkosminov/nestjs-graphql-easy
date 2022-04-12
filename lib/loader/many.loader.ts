@@ -13,15 +13,7 @@ export const manyLoader = (
   orders: OrderByCondition | null,
   paginations: IParsedPagination | null
 ) => {
-  let manager: EntityManager;
-
-  if (data.entity_manager) {
-    manager = data.entity_manager;
-  } else {
-    manager = getConnection().createEntityManager();
-  }
-
-  const qb = manager
+  const qb = data.entity_manager
     .getRepository(entity_table_name)
     .createQueryBuilder(entity_table_name)
     .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))

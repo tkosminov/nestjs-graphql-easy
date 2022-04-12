@@ -2,7 +2,7 @@ import { GraphQLExecutionContext, ReturnTypeFunc } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
-import { EntityManager, OrderByCondition } from 'typeorm';
+import { EntityManager, getConnection, OrderByCondition } from 'typeorm';
 
 import { underscore } from '../helper';
 
@@ -86,6 +86,14 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   entity_table_foreign_keys.forEach((fk) => {
     selected_columns.add(fk);
   });
+
+  if (!data.entity_manager) {
+    if (!gctx['entity_manager']) {
+      gctx['entity_manager'] = getConnection().createEntityManager();
+    }
+
+    data.entity_manager = gctx['entity_manager'];
+  }
 
   switch (data.loader_type) {
     case ELoaderType.MANY_TO_ONE:

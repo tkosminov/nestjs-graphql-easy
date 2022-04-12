@@ -7,15 +7,7 @@ import { ILoaderData } from './decorator.loader';
 
 export const oneToOneLoader = (selected_columns: Set<string>, entity_table_name: string, data: ILoaderData) => {
   return new Dataloader(async (keys: Array<string | number>) => {
-    let manager: EntityManager;
-
-    if (data.entity_manager) {
-      manager = data.entity_manager;
-    } else {
-      manager = getConnection().createEntityManager();
-    }
-
-    const qb = manager
+    const qb = data.entity_manager
       .getRepository(entity_table_name)
       .createQueryBuilder(entity_table_name)
       .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
