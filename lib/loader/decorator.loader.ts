@@ -1,8 +1,8 @@
 import { GraphQLExecutionContext, ReturnTypeFunc } from '@nestjs/graphql';
-import { createParamDecorator, ExecutionContext, Type } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
-import { OrderByCondition } from 'typeorm';
+import { EntityManager, OrderByCondition } from 'typeorm';
 
 import { underscore } from '../helper';
 
@@ -28,6 +28,7 @@ export interface ILoaderData {
   entity: ReturnTypeFunc;
   entity_fk_key: string;
   entity_fk_type?: string;
+  entity_manager?: EntityManager;
   loader_type: ELoaderType;
   field_name: string;
   entity_where?: {

@@ -1,4 +1,4 @@
-import { getRepository, OrderByCondition } from 'typeorm';
+import { EntityManager, getConnection, OrderByCondition } from 'typeorm';
 
 import { IParsedFilter } from '../filter/parser.filter';
 import { IParsedPagination } from '../pagination/parser.pagination';
@@ -13,7 +13,16 @@ export const manyLoader = (
   orders: OrderByCondition | null,
   paginations: IParsedPagination | null
 ) => {
-  const qb = getRepository(entity_table_name)
+  let manager: EntityManager;
+
+  if (data.entity_manager) {
+    manager = data.entity_manager;
+  } else {
+    manager = getConnection().createEntityManager();
+  }
+
+  const qb = manager
+    .getRepository(entity_table_name)
     .createQueryBuilder(entity_table_name)
     .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
     .where(`${entity_table_name}.${data.entity_fk_key} IS NOT NULL`);

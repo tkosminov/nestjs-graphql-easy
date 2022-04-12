@@ -1,5 +1,5 @@
 import Dataloader from 'dataloader';
-import { getRepository, OrderByCondition } from 'typeorm';
+import { EntityManager, getConnection, OrderByCondition } from 'typeorm';
 
 import { groupBy } from '../helper';
 import { IParsedFilter } from '../filter/parser.filter';
@@ -14,7 +14,16 @@ export const oneToManyLoader = (
   orders: OrderByCondition | null
 ) => {
   return new Dataloader(async (keys: Array<string | number>) => {
-    const qb = getRepository(entity_table_name)
+    let manager: EntityManager;
+
+    if (data.entity_manager) {
+      manager = data.entity_manager;
+    } else {
+      manager = getConnection().createEntityManager();
+    }
+
+    const qb = manager
+      .getRepository(entity_table_name)
       .createQueryBuilder(entity_table_name)
       .select(Array.from(selected_columns).map((selected_column) => `${entity_table_name}.${selected_column}`))
       .where(`${entity_table_name}.${data.entity_fk_key} IN (:...keys)`, {
