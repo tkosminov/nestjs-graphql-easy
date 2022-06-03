@@ -5,7 +5,7 @@ import { EntitiesModule } from './entities/entities.module';
 import GraphQLModule from './graphql/graphql.module';
 import { HealthzModule } from './healthz/healthz.module';
 import { LoggerModule } from './logger/logger.module';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { LoggerMiddleware } from './logger/logger.middleware';
 
 @Module({
   imports: [LoggerModule, HealthzModule, DatabaseModule, GraphQLModule, EntitiesModule],

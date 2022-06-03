@@ -1,16 +1,15 @@
-import { OrderByCondition } from 'typeorm';
-
+import { IParsedOrder } from '../order/parser.order';
 import { IParsedFilter } from '../filter/parser.filter';
 import { IParsedPagination } from '../pagination/parser.pagination';
 
-import { ILoaderData } from './decorator.loader';
+import { IPrivateLoaderData } from './decorator.loader';
 
 export const manyLoader = (
   selected_columns: Set<string>,
   entity_table_name: string,
-  data: ILoaderData,
+  data: IPrivateLoaderData,
   filters: IParsedFilter | null,
-  orders: OrderByCondition | null,
+  orders: IParsedOrder[] | null,
   paginations: IParsedPagination | null
 ) => {
   const qb = data.entity_manager
@@ -38,8 +37,14 @@ export const manyLoader = (
     qb.andWhere(filters.query, filters.params);
   }
 
-  if (orders) {
-    qb.orderBy(orders);
+  if (orders?.length) {
+    orders.forEach((order, index) => {
+      if (index === 0) {
+        qb.orderBy(order.sort, order.order, order.nulls);
+      } else {
+        qb.addOrderBy(order.sort, order.order, order.nulls);
+      }
+    });
   }
 
   if (paginations) {

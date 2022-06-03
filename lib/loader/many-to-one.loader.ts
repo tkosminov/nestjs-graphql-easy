@@ -2,9 +2,9 @@ import Dataloader from 'dataloader';
 
 import { reduceToObject } from '../helper';
 
-import { ILoaderData } from './decorator.loader';
+import { IPrivateLoaderData } from './decorator.loader';
 
-export const manyToOneLoader = (selected_columns: Set<string>, entity_table_name: string, data: ILoaderData) => {
+export const manyToOneLoader = (selected_columns: Set<string>, entity_table_name: string, data: IPrivateLoaderData) => {
   return new Dataloader(async (keys: Array<string | number>) => {
     const qb = data.entity_manager
       .getRepository(entity_table_name)

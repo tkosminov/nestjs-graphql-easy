@@ -64,6 +64,10 @@ export function getMethod(req: Request) {
   return req.method;
 }
 
+export function getRequestHeader(req: Request, field: string) {
+  return req.headers[field] as string;
+}
+
 export function getUserAgent(req: Request) {
-  return req.headers['user-agent'] || '-';
+  return getRequestHeader(req, 'user-agent') || '-';
 }

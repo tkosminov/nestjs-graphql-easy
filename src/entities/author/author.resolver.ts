@@ -1,15 +1,12 @@
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
 import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
-import { AuthorService } from './author.service';
 
 @Resolver(() => Author)
 export class AuthorResolver {
-  constructor(private readonly authorService: AuthorService) {}
-
   @Query(() => [Author])
   public async authors(
     @Loader({
@@ -25,11 +22,6 @@ export class AuthorResolver {
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
-  }
-
-  @Query(() => Author)
-  public async author(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.authorService.findOne({ where: { id } });
   }
 
   @ResolveField(() => [Book], { nullable: true })

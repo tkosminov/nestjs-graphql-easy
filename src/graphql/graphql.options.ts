@@ -5,6 +5,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLError, GraphQLSchema } from 'graphql';
 import config from 'config';
 import { Request } from 'express';
+import { DataSource } from 'typeorm';
 
 import { LoggerStore } from '../logger/logger.store';
 import { corsOptionsDelegate } from '../cors.options';
@@ -14,6 +15,8 @@ const graphqlSettings = config.get<IGraphqlSettings>('GRAPHQL_SETTINGS');
 
 @Injectable()
 export class GraphqlOptions implements GqlOptionsFactory {
+  constructor(private readonly dataSource: DataSource) {}
+
   public createGqlOptions(): Promise<ApolloDriverConfig> | ApolloDriverConfig {
     return {
       ...graphqlSettings,
@@ -25,6 +28,7 @@ export class GraphqlOptions implements GqlOptionsFactory {
       context: ({ req }: { req: Request & { logger_store: LoggerStore } }) => ({
         req,
         logger_store: req.logger_store,
+        data_source: this.dataSource,
       }),
       cors: corsOptionsDelegate,
       bodyParserConfig: {

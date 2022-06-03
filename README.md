@@ -16,7 +16,68 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 npm i nestjs-graphql-easy
 ```
 
+## Fully working example with all types dataloader
+
+[https://github.com/TimurRK/nestjs-graphql-easy](https://github.com/TimurRK/nestjs-graphql-easy)
+
+`If you have questions or need help, please create GitHub Issue in this repository`
+
+## Dependencies!
+
+1. NestJS 8
+2. TypeORM 0.3
+
 ## Usage
+
+### DataSource
+
+Need to pass `DataSource` from `DatabaseModule` to `GraphQLExecutionContext`
+
+#### GraphQLModule
+
+```ts
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver } from '@nestjs/apollo';
+
+import { DatabaseModule } from '../database/database.module'; // <-- ADD
+
+import { GraphqlOptions } from './graphql.options';
+
+export default GraphQLModule.forRootAsync({
+  imports: [DatabaseModule], // <-- ADD
+  useClass: GraphqlOptions,
+  inject: [],
+  driver: ApolloDriver,
+});
+```
+
+#### GraphqlOptions
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { GqlOptionsFactory } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+...
+import { Request } from 'express';
+import { DataSource } from 'typeorm';
+
+@Injectable()
+export class GraphqlOptions implements GqlOptionsFactory {
+  constructor(private readonly dataSource: DataSource) {} // <-- ADD
+
+  public createGqlOptions(): Promise<ApolloDriverConfig> | ApolloDriverConfig {
+    return {
+      ...
+      driver: ApolloDriver,
+      context: ({ req }: { req: Request }) => ({
+        req,
+        data_source: this.dataSource, // <-- ADD
+      }),
+      ...
+    };
+  }
+}
+```
 
 ### Important!
 
@@ -29,12 +90,9 @@ npm i nestjs-graphql-easy
 4. Decorators `Filter`, `Order` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY` and `ELoaderType.ONE_TO_MANY`
 5. Decorators `Pagination` from `nestjs-graphql-easy` work only with loader types `ELoaderType.MANY`
 
-### Dependencies!
+### Basic example
 
-1. NestJS 8
-2. TypeORM
-
-### Entity/Object basic example
+#### Entity/Object
 
 ```ts
 import { ID } from '@nestjs/graphql';
@@ -48,14 +106,20 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn
-} from 'nestjs-graphql-easy';
+} from 'nestjs-graphql-easy'; // <-- ADD
 
 import { Book } from '../book/book.entity';
 
 @ObjectType()
 @Entity()
 export class Author {
-  @Field(() => ID, { filterable: true, sortable: true })
+  /**
+   * filterable - default = false
+   * sortable - default = false
+   * 
+   * Put in true if you need filters or sorting 
+   */
+  @Field(() => ID, { filterable: true, sortable: true }) // <-- ADD
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
@@ -78,15 +142,18 @@ export class Author {
   @Index({ unique: true })
   public name: string;
 
+  /**
+   * Relations for GraphQL must be made in Resolver via ResolveField
+   */
   @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
   public books: Book[];
 }
 ```
 
-### Resolver basic example
+#### Resolver
 
 ```ts
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
 import {
   Query,
@@ -96,33 +163,30 @@ import {
   Filter,
   Order,
   Pagination
-} from 'nestjs-graphql-easy';
+} from 'nestjs-graphql-easy'; // <-- ADD
 
 import { Book } from '../book/book.entity';
 import { Author } from './author.entity';
-import { AuthorService } from './author.service';
 
 @Resolver(() => Author)
 export class AuthorResolver {
-  constructor(private readonly authorService: AuthorService) {}
-
   @Query(() => [Author])
   public async authors(
-    @Loader({
-      loader_type: ELoaderType.MANY,
+    @Loader({ // <-- ADD
+      loader_type: ELoaderType.MANY, 
       field_name: 'authors',
       entity: () => Author,
       entity_fk_key: 'id',
     }) field_alias: string,
-    @Filter(() => Author) _filter: unknown,
-    @Order(() => Author) _order: unknown,
-    @Pagination() _pagination: unknown,
+    @Filter(() => Author) _filter: unknown, // <-- ADD if you need filters
+    @Order(() => Author) _order: unknown, // <-- ADD if you need orders
+    @Pagination() _pagination: unknown, // <-- ADD if you need paginations
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
   }
 
-  @ResolveField(() => [Book], { nullable: true })
+  @ResolveField(() => [Book], { nullable: true }) // <-- ADD
   public async books(
     @Parent() author: Author,
     @Loader({
@@ -130,19 +194,19 @@ export class AuthorResolver {
       field_name: 'books',
       entity: () => Book,
       entity_fk_key: 'author_id',
-      entity_joins: [
+      entity_joins: [ // <-- ADD if you need default joins
         {
           query: 'book.author',
           alias: 'author',
         },
       ],
-      entity_wheres: [
+      entity_wheres: [ // <-- ADD if you need default filters
         {
           query: 'book.is_private = :is_private',
           params: { is_private: false },
         },
         {
-          query: 'author.id IS NOT NULL',
+          query: 'author.id IS NOT NULL', // <-- ADD if you added default joins
         },
       ],
     })
@@ -156,7 +220,7 @@ export class AuthorResolver {
 }
 ```
 
-### Query basic example
+#### GraphQL query
 
 ```graphql
 query {
@@ -175,7 +239,9 @@ query {
 }
 ```
 
-### Entity/Object with polymorphic relation example
+### Polymorphic example
+
+#### Entity/Object
 
 ```ts
 import { ID } from '@nestjs/graphql';
@@ -191,7 +257,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn
-} from 'nestjs-graphql-easy';
+} from 'nestjs-graphql-easy'; // <-- ADD
 
 import { Section } from '../section/section.entity';
 
@@ -225,21 +291,26 @@ export class Item {
   @JoinColumn({ name: 'section_id' })
   public section: Section;
 
+  /**
+   * For a polymorphic relationship, the relationship in the Entity is not specified.
+   * But you need to create columns for foreign key and table type.
+   */
+
   @Field(() => ID, { filterable: true, sortable: true })
   @Index()
   @Column('uuid', { nullable: false })
-  @PolymorphicColumn() // <-- add
-  public itemable_id: string;
+  @PolymorphicColumn() // <-- ADD
+  public itemable_id: string; // foreign key
 
   @Field(() => String, { filterable: true, sortable: true })
   @Index()
   @Column({ nullable: false })
-  @PolymorphicColumn() // <-- add
-  public itemable_type: string;
+  @PolymorphicColumn() // <-- ADD
+  public itemable_type: string; // foreign type
 }
 ```
 
-### Polymorphic union type example
+#### Union type
 
 ```ts
 import { createUnionType } from '@nestjs/graphql';
@@ -260,10 +331,10 @@ export const ItemableType = createUnionType({
 });
 ```
 
-### Resolver with polymorphic relation example
+#### Resolver
 
 ```ts
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
 import {
   Query,
@@ -273,18 +344,15 @@ import {
   Filter,
   Order,
   Pagination
-} from 'nestjs-graphql-easy';
+} from 'nestjs-graphql-easy'; // <-- ADD
 
 import { Section } from '../section/section.entity';
 
 import { Item } from './item.entity';
-import { ItemService } from './item.service';
 import { ItemableType } from './item.itemable';
 
 @Resolver(() => Item)
 export class ItemResolver {
-  constructor(private readonly itemService: ItemService) {}
-
   @Query(() => [Item])
   public async items(
     @Loader({
@@ -301,27 +369,14 @@ export class ItemResolver {
     return await ctx[field_alias];
   }
 
-  @ResolveField(() => Section, { nullable: false })
-  public async section(
-    @Parent() item: Item,
-    @Loader({
-      loader_type: ELoaderType.MANY_TO_ONE,
-      field_name: 'section',
-      entity: () => Section,
-      entity_fk_key: 'id',
-    }) field_alias: string,
-    @Context() ctx: GraphQLExecutionContext
-  ): Promise<Section> {
-    return await ctx[field_alias].load(item.section_id);
-  }
-
-  @ResolveField(() => ItemableType, { nullable: true })
+  @ResolveField(() => ItemableType, { nullable: true }) // <-- ADD
   public async itemable(
     @Parent() item: Item,
     @Loader({
       loader_type: ELoaderType.POLYMORPHIC,
       field_name: 'itemable',
-      entity: () => ItemableType,
+      // For a polymorphic relation, it is necessary to specify here not the Entity, but the Union type.
+      entity: () => ItemableType, // <-- ADD
       entity_fk_key: 'id',
       entity_fk_type: 'itemable_type',
     }) field_alias: string,
@@ -332,7 +387,7 @@ export class ItemResolver {
 }
 ```
 
-### Query with polymorphic relation example
+### GraphQL query
 
 ```graphql
 query {

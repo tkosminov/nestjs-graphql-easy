@@ -4,8 +4,8 @@ import config from 'config';
 import { NextFunction, Request, Response } from 'express';
 
 import { getAction, getForwardedIp, getIp, getMethod, getOrigin, getPath, getReferrer, getUserAgent } from '../helpers/req.helper';
-import { LoggerService } from '../logger/logger.service';
-import { LoggerStore } from '../logger/logger.store';
+import { LoggerService } from './logger.service';
+import { LoggerStore } from './logger.store';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {

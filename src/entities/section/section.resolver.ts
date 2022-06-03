@@ -1,18 +1,15 @@
-import { Args, Context, GraphQLExecutionContext, ID, Parent, Resolver } from '@nestjs/graphql';
+import { Context, GraphQLExecutionContext, Parent, Resolver } from '@nestjs/graphql';
 
 import { Query, ResolveField, ELoaderType, Loader, Filter, Order, Pagination } from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
 import { Section } from './section.entity';
-import { SectionService } from './section.service';
 
 import { SectionTitle } from '../section-title/section-title.entity';
 import { Item } from '../item/item.entity';
 
 @Resolver(() => Section)
 export class SectionResolver {
-  constructor(private readonly sectionService: SectionService) {}
-
   @Query(() => [Section])
   public async sections(
     @Loader({
@@ -28,11 +25,6 @@ export class SectionResolver {
     @Context() ctx: GraphQLExecutionContext
   ) {
     return await ctx[field_alias];
-  }
-
-  @Query(() => Section)
-  public async section(@Args({ name: 'id', type: () => ID }) id: string) {
-    return await this.sectionService.findOne({ where: { id } });
   }
 
   @ResolveField(() => Book, { nullable: false })

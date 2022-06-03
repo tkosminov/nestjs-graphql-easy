@@ -1,17 +1,17 @@
 import Dataloader from 'dataloader';
-import { OrderByCondition } from 'typeorm';
 
+import { IParsedOrder } from '../order/parser.order';
 import { groupBy } from '../helper';
 import { IParsedFilter } from '../filter/parser.filter';
 
-import { ILoaderData } from './decorator.loader';
+import { IPrivateLoaderData } from './decorator.loader';
 
 export const oneToManyLoader = (
   selected_columns: Set<string>,
   entity_table_name: string,
-  data: ILoaderData,
+  data: IPrivateLoaderData,
   filters: IParsedFilter | null,
-  orders: OrderByCondition | null
+  orders: IParsedOrder[] | null
 ) => {
   return new Dataloader(async (keys: Array<string | number>) => {
     const qb = data.entity_manager
@@ -41,8 +41,14 @@ export const oneToManyLoader = (
       qb.andWhere(filters.query, filters.params);
     }
 
-    if (orders) {
-      qb.orderBy(orders);
+    if (orders?.length) {
+      orders.forEach((order, index) => {
+        if (index === 0) {
+          qb.orderBy(order.sort, order.order, order.nulls);
+        } else {
+          qb.addOrderBy(order.sort, order.order, order.nulls);
+        }
+      });
     }
 
     const poll_options = await qb.getMany();

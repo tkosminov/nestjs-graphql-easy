@@ -2,12 +2,12 @@ import { GraphQLExecutionContext, ReturnTypeFunc } from '@nestjs/graphql';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
-import { EntityManager, getConnection, OrderByCondition } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 
 import { underscore } from '../helper';
 
 import { IFilterValue, IParsedFilter, parseFilter } from '../filter/parser.filter';
-import { IOrderValue, parseOrder } from '../order/parser.order';
+import { IOrderValue, IParsedOrder, parseOrder } from '../order/parser.order';
 import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/parser.pagination';
 import { getTableColumns, getTableForeignKeys } from '../store';
 
@@ -30,7 +30,6 @@ export interface ILoaderData {
   entity: ReturnTypeFunc;
   entity_fk_key: string;
   entity_fk_type?: string;
-  entity_manager?: EntityManager;
   entity_joins?: Array<{
     query: string;
     alias: string;
@@ -41,20 +40,26 @@ export interface ILoaderData {
   }>;
 }
 
+export interface IPrivateLoaderData extends ILoaderData {
+  entity_manager?: EntityManager;
+}
+
 export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {
   const args = ctx.getArgs();
 
+  const _data: IPrivateLoaderData = data;
+
   const parent: Record<string, unknown> | null = args[0];
   const gargs: Record<string, any> | undefined | null = args[1];
-  const gctx: GraphQLExecutionContext = args[2];
+  const gctx: GraphQLExecutionContext & { data_source: DataSource } = args[2];
   const info: GraphQLResolveInfo = args[3];
 
   let entity_class_name: string;
 
-  if (data.loader_type === ELoaderType.POLYMORPHIC) {
-    entity_class_name = parent[data.entity_fk_type] as string;
+  if (_data.loader_type === ELoaderType.POLYMORPHIC) {
+    entity_class_name = parent[_data.entity_fk_type] as string;
   } else {
-    entity_class_name = data.entity()['name'];
+    entity_class_name = _data.entity()['name'];
   }
 
   const entity_table_name = underscore(entity_class_name);
@@ -68,7 +73,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   }
 
   const orders = gargs['ORDER'];
-  let parsed_orders: OrderByCondition = null;
+  let parsed_orders: IParsedOrder[] = null;
 
   if (orders) {
     parsed_orders = parseOrder(entity_table_name, orders as IOrderValue);
@@ -81,7 +86,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     parsed_paginations = parsePagination(paginations as IPaginationValue);
   }
 
-  const selected_fields = recursiveSelectedFields(data, info.fieldNodes, info.fragments);
+  const selected_fields = recursiveSelectedFields(_data, info.fieldNodes, info.fragments);
   const entity_table_columns = getTableColumns(entity_class_name);
   const entity_table_foreign_keys = getTableForeignKeys(entity_class_name);
 
@@ -91,29 +96,29 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     selected_columns.add(fk);
   });
 
-  if (!data.entity_manager) {
+  if (!_data.entity_manager) {
     if (!gctx['entity_manager']) {
-      gctx['entity_manager'] = getConnection().createEntityManager();
+      gctx['entity_manager'] = gctx.data_source.createEntityManager();
     }
 
-    data.entity_manager = gctx['entity_manager'];
+    _data.entity_manager = gctx['entity_manager'];
   }
 
-  switch (data.loader_type) {
+  switch (_data.loader_type) {
     case ELoaderType.MANY_TO_ONE:
-      gctx[field_alias] = manyToOneLoader(selected_columns, entity_table_name, data);
+      gctx[field_alias] = manyToOneLoader(selected_columns, entity_table_name, _data);
       break;
     case ELoaderType.ONE_TO_MANY:
-      gctx[field_alias] = oneToManyLoader(selected_columns, entity_table_name, data, parsed_filters, parsed_orders);
+      gctx[field_alias] = oneToManyLoader(selected_columns, entity_table_name, _data, parsed_filters, parsed_orders);
       break;
     case ELoaderType.ONE_TO_ONE:
-      gctx[field_alias] = oneToOneLoader(selected_columns, entity_table_name, data);
+      gctx[field_alias] = oneToOneLoader(selected_columns, entity_table_name, _data);
       break;
     case ELoaderType.MANY:
-      gctx[field_alias] = manyLoader(selected_columns, entity_table_name, data, parsed_filters, parsed_orders, parsed_paginations);
+      gctx[field_alias] = manyLoader(selected_columns, entity_table_name, _data, parsed_filters, parsed_orders, parsed_paginations);
       break;
     case ELoaderType.POLYMORPHIC:
-      gctx[field_alias] = oneToOneLoader(selected_columns, entity_table_name, data);
+      gctx[field_alias] = oneToOneLoader(selected_columns, entity_table_name, _data);
       break;
     default:
       break;

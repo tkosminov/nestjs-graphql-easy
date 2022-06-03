@@ -20,9 +20,6 @@ export function getOrmConfig(): TypeOrmModuleOptions {
       migrationsRun: true,
       synchronize: settings.synchronize || false,
       logging: settings.logging,
-      cli: {
-        migrationsDir: __dirname + '/migrations/**/*{.ts,.js}',
-      },
       extra: {
         connectionLimit: 15,
       },
@@ -34,11 +31,7 @@ export function getOrmConfig(): TypeOrmModuleOptions {
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
       migrationsRun: true,
-      keepConnectionAlive: true,
       synchronize: true,
-      cli: {
-        migrationsDir: __dirname + '/migrations/**/*{.ts,.js}',
-      },
     };
   }
   return ormConfig;
