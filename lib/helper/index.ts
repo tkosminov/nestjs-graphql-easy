@@ -1,4 +1,4 @@
-import { ClassConstructor, plainToClass } from 'class-transformer';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validateSync, ValidationError } from 'class-validator';
 
 import { bad_request } from '../error';
@@ -51,7 +51,7 @@ export function groupBy<T>(array: T[], key: string): { [key: string]: T[] } {
 }
 
 export function validateDTO(type: ClassConstructor<unknown>, value: unknown) {
-  const errors: ValidationError[] = validateSync(plainToClass(type, value) as object, { skipMissingProperties: true });
+  const errors: ValidationError[] = validateSync(plainToInstance(type, value) as object, { skipMissingProperties: true });
 
   if (errors.length > 0) {
     const msg = errors.map((error) => Object.values(error.constraints)).join(', ');
