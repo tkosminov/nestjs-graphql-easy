@@ -31,7 +31,7 @@ npm i nestjs-graphql-easy
 
 ### DataSource
 
-Need to pass `DataSource` from `DatabaseModule` to `GraphQLExecutionContext`
+Need to pass `DataSource` to `GraphQLExecutionContext`
 
 #### GraphQLModule
 
@@ -39,13 +39,11 @@ Need to pass `DataSource` from `DatabaseModule` to `GraphQLExecutionContext`
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 
-import { DatabaseModule } from '../database/database.module'; // <-- ADD
-
 import { GraphqlOptions } from './graphql.options';
 
 export default GraphQLModule.forRootAsync({
-  imports: [DatabaseModule], // <-- ADD
-  useClass: GraphqlOptions,
+  imports: [],
+  useClass: GraphqlOptions, // <-- ADD
   inject: [],
   driver: ApolloDriver,
 });
