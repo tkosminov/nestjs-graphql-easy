@@ -9,4 +9,5 @@ export {
   PrimaryGeneratedColumn,
   getTableColumns,
   getTableForeignKeys,
+  getTablePrimaryKeys,
 } from './typeorm';

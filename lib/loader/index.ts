@@ -1,1 +1,1 @@
-export { Loader, ELoaderType, ILoaderData } from './decorator.loader';
+export { Loader, ELoaderType, ILoaderData, setDataSource } from './decorator.loader';

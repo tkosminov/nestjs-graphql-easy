@@ -5,13 +5,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
+      "name": "debug",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ts-node",
+      "args": [
+        "${workspaceFolder}/src/main.ts",
+        "--runInBand",
+        "--no-cache",
       ],
-      "program": "${workspaceFolder}/src/main.ts"
+      "runtimeArgs": [
+        "--files",
+        "-r",
+        "${workspaceFolder}/node_modules/tsconfig-paths/register"
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
+      },
     }
   ]
 }

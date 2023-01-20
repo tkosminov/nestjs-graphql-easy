@@ -9,7 +9,8 @@ import { underscore } from '../helper';
 import { IFilterValue, IParsedFilter, parseFilter } from '../filter/parser.filter';
 import { IOrderValue, IParsedOrder, parseOrder } from '../order/parser.order';
 import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/parser.pagination';
-import { getTableColumns, getTableForeignKeys } from '../store';
+import { getTableColumns, getTableForeignKeys, getTablePrimaryKeys } from '../store';
+import { invalid_data_source } from '../error';
 
 import { manyToOneLoader } from './many-to-one.loader';
 import { oneToManyLoader } from './one-to-many.loader';
@@ -42,6 +43,12 @@ export interface ILoaderData {
 
 export interface IPrivateLoaderData extends ILoaderData {
   entity_manager?: EntityManager;
+}
+
+let data_source: DataSource = null;
+
+export function setDataSource(ds: DataSource) {
+  data_source = ds;
 }
 
 export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionContext) => {
@@ -89,6 +96,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   const selected_fields = recursiveSelectedFields(_data, info.fieldNodes, info.fragments);
   const entity_table_columns = getTableColumns(entity_class_name);
   const entity_table_foreign_keys = getTableForeignKeys(entity_class_name);
+  const entity_table_primary_keys = getTablePrimaryKeys(entity_class_name);
 
   const selected_columns = new Set(Array.from(selected_fields).filter((field) => entity_table_columns.has(field)));
 
@@ -96,9 +104,19 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     selected_columns.add(fk);
   });
 
+  entity_table_primary_keys.forEach((pk) => {
+    selected_columns.add(pk);
+  });
+
   if (!_data.entity_manager) {
     if (!gctx['entity_manager']) {
-      gctx['entity_manager'] = gctx.data_source.createEntityManager();
+      if (data_source) {
+        gctx['entity_manager'] = data_source.createEntityManager();
+      } else if (gctx?.data_source) {
+        gctx['entity_manager'] = gctx.data_source.createEntityManager();
+      } else {
+        invalid_data_source({ raise: true });
+      }
     }
 
     _data.entity_manager = gctx['entity_manager'];

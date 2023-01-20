@@ -40,6 +40,11 @@ export const table_columns: Map<string, Set<string>> = new Map();
  */
 export const table_foreign_keys: Map<string, Set<string>> = new Map();
 
+/**
+ * Map<entity_class_name, Set<entity_column_name>>
+ */
+export const table_primary_keys: Map<string, Set<string>> = new Map();
+
 export function getTableColumns(entity_class_name: string) {
   if (table_columns.has(entity_class_name)) {
     return table_columns.get(entity_class_name);
@@ -78,6 +83,28 @@ export function getTableForeignKeys(entity_class_name: string) {
   });
 
   return table_foreign_keys.get(entity_class_name) || new Set();
+}
+
+export function getTablePrimaryKeys(entity_class_name: string) {
+  if (table_primary_keys.has(entity_class_name)) {
+    return table_primary_keys.get(entity_class_name);
+  }
+
+  const typeormArgs = getMetadataArgsStorage();
+
+  typeormArgs.columns.forEach((col) => {
+    if (col.options?.primary) {
+      if (!table_primary_keys.has(col.target['name'])) {
+        table_primary_keys.set(col.target['name'], new Set([]));
+      }
+
+      const fks = table_primary_keys.get(col.target['name']);
+
+      fks.add(col.propertyName);
+    }
+  });
+
+  return table_primary_keys.get(entity_class_name) || new Set();
 }
 
 export function PolymorphicColumn(): PropertyDecorator {

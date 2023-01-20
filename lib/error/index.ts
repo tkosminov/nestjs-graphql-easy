@@ -20,3 +20,19 @@ export const bad_request = (data?: IErrData) => {
 
   return err;
 };
+
+export const invalid_data_source = (data?: IErrData) => {
+  const err = new HttpException(
+    {
+      status: 500,
+      error: data?.msg || 'INVALID_DATA_SOURCE',
+    },
+    500
+  );
+
+  if (data?.raise) {
+    throw err;
+  }
+
+  return err;
+};

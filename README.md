@@ -48,10 +48,13 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 ...
 import { Request } from 'express';
 import { DataSource } from 'typeorm';
+import { setDataSource } from 'nestjs-graphql-easy' // <-- ADD
 
 @Injectable()
 export class GraphqlOptions implements GqlOptionsFactory {
-  constructor(private readonly dataSource: DataSource) {} // <-- ADD
+  constructor(private readonly dataSource: DataSource) { // <-- ADD
+    setDataSource(this.dataSource); // <-- ADD
+  }
 
   public createGqlOptions(): Promise<ApolloDriverConfig> | ApolloDriverConfig {
     return {
@@ -59,7 +62,7 @@ export class GraphqlOptions implements GqlOptionsFactory {
       driver: ApolloDriver,
       context: ({ req }: { req: Request }) => ({
         req,
-        data_source: this.dataSource, // <-- ADD
+        data_source: this.dataSource, // <-- DEPRECATED. But this will still work if no subscriptions are used
       }),
       ...
     };
