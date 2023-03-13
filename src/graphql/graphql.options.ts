@@ -37,10 +37,6 @@ export class GraphqlOptions implements GqlOptionsFactory {
         req,
         logger_store: req.logger_store,
       }),
-      cors: corsOptionsDelegate,
-      bodyParserConfig: {
-        limit: appSettings.bodyLimit,
-      },
       transformSchema: (schema: GraphQLSchema) => {
         return schema;
       },

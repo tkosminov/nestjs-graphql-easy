@@ -62,7 +62,6 @@ export class GraphqlOptions implements GqlOptionsFactory {
       driver: ApolloDriver,
       context: ({ req }: { req: Request }) => ({
         req,
-        data_source: this.dataSource, // <-- DEPRECATED. But this will still work if no subscriptions are used
       }),
       ...
     };

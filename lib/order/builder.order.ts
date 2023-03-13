@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Type } from '@nestjs/common';
 import { InputType, registerEnumType, ReturnTypeFunc } from '@nestjs/graphql';
 
 import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store/graphql';
