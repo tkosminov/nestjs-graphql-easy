@@ -42,10 +42,10 @@ export class Book {
   @Column('uuid', { nullable: false })
   public author_id: string;
 
-  @ManyToOne(() => Author, { nullable: false })
+  @ManyToOne(() => Author, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author_id' })
   public author: Author;
 
-  @OneToMany(() => Section, (section) => section.book, { onDelete: 'CASCADE' })
+  @OneToMany(() => Section, (section) => section.book)
   public sections: Section[];
 }

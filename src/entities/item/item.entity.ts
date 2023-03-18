@@ -41,7 +41,7 @@ export class Item {
   @Column('uuid', { nullable: false })
   public section_id: string;
 
-  @ManyToOne(() => Section, { nullable: false })
+  @ManyToOne(() => Section, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'section_id' })
   public section: Section;
 

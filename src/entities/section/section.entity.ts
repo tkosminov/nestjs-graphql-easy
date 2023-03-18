@@ -38,13 +38,13 @@ export class Section {
   @Column('uuid', { nullable: false })
   public book_id: string;
 
-  @ManyToOne(() => Book, { nullable: false })
+  @ManyToOne(() => Book, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'book_id' })
   public book: Book;
 
   @OneToOne(() => SectionTitle, (section_title) => section_title.section)
   public section_title: SectionTitle;
 
-  @OneToMany(() => Item, (item) => item.section, { onDelete: 'CASCADE' })
+  @OneToMany(() => Item, (item) => item.section)
   public items: Item[];
 }

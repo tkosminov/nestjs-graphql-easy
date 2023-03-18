@@ -33,6 +33,6 @@ export class Author {
   @Index({ unique: true })
   public name: string;
 
-  @OneToMany(() => Book, (book) => book.author, { onDelete: 'CASCADE' })
+  @OneToMany(() => Book, (book) => book.author)
   public books: Book[];
 }
