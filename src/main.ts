@@ -7,14 +7,22 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
 import { json, urlencoded } from 'body-parser';
+import { DataSourceOptions } from 'typeorm';
+import { createDatabase } from 'typeorm-extension';
 
 import { AppModule } from './app.module';
 import { corsOptionsDelegate } from './cors.options';
+import { getOrmConfig } from './database/database-ormconfig.constant';
 
 const appSettings = config.get<IAppSettings>('APP_SETTINGS');
 
 async function bootstrap() {
   const server = express();
+
+  await createDatabase({
+    ifNotExist: true,
+    options: getOrmConfig() as DataSourceOptions,
+  });
 
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
     bodyParser: true,
@@ -33,6 +41,7 @@ async function bootstrap() {
   app.use(
     helmet({
       contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
     })
   );
 

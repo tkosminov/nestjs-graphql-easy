@@ -2,9 +2,27 @@ import { Extensions, ID } from '@nestjs/graphql';
 
 import { Index, OneToMany } from 'typeorm';
 
-import { ObjectType, Field, Column, Entity, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'nestjs-graphql-easy';
+import {
+  ObjectType,
+  Field,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn,
+  registerEnumType,
+} from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
+
+export enum EAuthorGender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+registerEnumType(EAuthorGender, {
+  name: 'EAuthorGender',
+});
 
 @ObjectType()
 @Entity()
@@ -32,6 +50,11 @@ export class Author {
   @Column()
   @Index({ unique: true })
   public name: string;
+
+  @Field(() => EAuthorGender, { filterable: true })
+  @Column('enum', { enum: EAuthorGender, nullable: false })
+  @Index()
+  public gender: EAuthorGender;
 
   @OneToMany(() => Book, (book) => book.author)
   public books: Book[];

@@ -95,10 +95,20 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
+  registerEnumType
 } from 'nestjs-graphql-easy'; // <-- ADD
 
 import { Book } from '../book/book.entity';
+
+export enum EAuthorGender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+registerEnumType(EAuthorGender, {
+  name: 'EAuthorGender',
+});
 
 @ObjectType()
 @Entity()
@@ -131,6 +141,11 @@ export class Author {
   @Column()
   @Index({ unique: true })
   public name: string;
+
+  @Field(() => EAuthorGender, { filterable: true })
+  @Column('enum', { enum: EAuthorGender, nullable: false })
+  @Index()
+  public gender: EAuthorGender;
 
   /**
    * Relations for GraphQL must be made in Resolver via ResolveField

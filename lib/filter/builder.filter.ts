@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
 
-import { decorateField, where_field_input_types, where_input_types, gql_fields, IField } from '../store/graphql';
+import { decorateField, where_field_input_types, where_input_types, gql_fields, gql_enums, IField } from '../store/graphql';
 
 export enum EFilterOperator {
   AND = 'AND',
@@ -30,10 +30,30 @@ const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
 
+function findEnumName(col_type: GqlTypeReference) {
+  let col_type_name: string = null;
+
+  gql_enums.forEach((e) => {
+    if (e.type_function() === col_type) {
+      col_type_name = e.name;
+
+      return;
+    }
+  });
+
+  return col_type_name;
+}
+
 const buildFilterField = (column: IField): ReturnTypeFunc => {
   const col_type: GqlTypeReference = column.type_function();
 
-  const name = `${col_type['name']}_FilterInputType`;
+  let col_type_name: string = col_type['name'];
+
+  if (col_type_name == null) {
+    col_type_name = findEnumName(col_type);
+  }
+
+  const name = `${col_type_name}_FilterInputType`;
 
   if (where_field_input_types.has(name)) {
     return where_field_input_types.get(name);

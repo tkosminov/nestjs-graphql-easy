@@ -10,6 +10,8 @@ import {
   ResolveFieldOptions,
   Mutation as GqlMutation,
   MutationOptions,
+  registerEnumType as gqlRegisterEnumType,
+  EnumOptions,
 } from '@nestjs/graphql';
 
 export interface IObjectType {
@@ -36,6 +38,11 @@ export interface IQueryOrMutation {
   type_function: ReturnTypeFunc;
 }
 
+export interface IEnum {
+  name: string;
+  type_function: ReturnTypeFunc;
+}
+
 export interface IQuery extends IQueryOrMutation {
   options?: Omit<QueryOptions, 'name'>;
 }
@@ -57,6 +64,11 @@ export const gql_objects: Map<string, IObjectType> = new Map();
  * Map<entity_class_name, Set<IField>>
  */
 export const gql_fields: Map<string, Set<IField>> = new Map();
+
+/**
+ * Map<entity_class_name, Set<IField>>
+ */
+export const gql_enums: Map<string, IEnum> = new Map();
 
 /**
  * Map<resolver_class_name, Set<IQuery>>
@@ -184,4 +196,15 @@ export function ResolveField(returnTypeFunction: ReturnTypeFunc, options?: Omit<
 
     return GqlResolveField(returnTypeFunction, options)(prototype, property_key, descriptor);
   };
+}
+
+export function registerEnumType<T extends object = any>(enumRef: T, options: EnumOptions<T>) {
+  if (!gql_enums.has(options.name)) {
+    gql_enums.set(options.name, {
+      name: options.name,
+      type_function: () => enumRef,
+    });
+  }
+
+  return gqlRegisterEnumType(enumRef, options);
 }

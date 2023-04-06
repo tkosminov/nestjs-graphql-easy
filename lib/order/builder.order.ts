@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { InputType, registerEnumType, ReturnTypeFunc } from '@nestjs/graphql';
+import { InputType, ReturnTypeFunc } from '@nestjs/graphql';
 
-import { decorateField, order_field_input_types, order_input_types, gql_fields, IField } from '../store/graphql';
+import { decorateField, order_field_input_types, order_input_types, gql_fields, IField, registerEnumType } from '../store/graphql';
 
 export enum EOrderQuery {
   SORT = 'SORT',
