@@ -24,6 +24,15 @@ registerEnumType(EAuthorGender, {
   name: 'EAuthorGender',
 });
 
+export enum EAuthorType {
+  AUTHOR = 1,
+  CO_AUTHOR = 2,
+}
+
+registerEnumType(EAuthorType, {
+  name: 'EAuthorType',
+});
+
 @ObjectType()
 @Entity()
 export class Author {
@@ -55,6 +64,11 @@ export class Author {
   @Column('enum', { enum: EAuthorGender, nullable: false })
   @Index()
   public gender: EAuthorGender;
+
+  @Field(() => EAuthorType, { filterable: true })
+  @Column('enum', { enum: EAuthorType, nullable: false })
+  @Index()
+  public author_type: EAuthorType;
 
   @OneToMany(() => Book, (book) => book.author)
   public books: Book[];

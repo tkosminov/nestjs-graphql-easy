@@ -3,7 +3,7 @@
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import { Author, EAuthorGender } from '../../entities/author/author.entity';
+import { Author, EAuthorGender, EAuthorType } from '../../entities/author/author.entity';
 import { Book } from '../../entities/book/book.entity';
 import { Section } from '../../entities/section/section.entity';
 import { SectionTitle } from '../../entities/section-title/section-title.entity';
@@ -22,11 +22,13 @@ export class seed1588955268370 implements MigrationInterface {
           id: '1049e157-ff4c-45ff-a40c-2ed44030a5e6',
           name: 'Author 1',
           gender: EAuthorGender.MALE,
+          author_type: EAuthorType.AUTHOR,
         },
         {
           id: '9363ec6f-a3ef-4c13-91da-fd40352e1936',
           name: 'Author 2',
           gender: EAuthorGender.FEMALE,
+          author_type: EAuthorType.AUTHOR,
         },
       ])
       .execute();
