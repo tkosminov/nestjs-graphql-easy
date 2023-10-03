@@ -12,6 +12,7 @@ export class ItemImage {
   @Field(() => Date)
   @CreateDateColumn({
     type: 'timestamp without time zone',
+    precision: 3,
     default: () => 'CURRENT_TIMESTAMP',
   })
   public created_at: Date;
@@ -19,6 +20,7 @@ export class ItemImage {
   @Field(() => Date)
   @UpdateDateColumn({
     type: 'timestamp without time zone',
+    precision: 3,
     default: () => 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;

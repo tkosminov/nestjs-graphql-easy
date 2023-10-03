@@ -49,7 +49,10 @@ export const manyLoader = (
 
   if (paginations) {
     qb.limit(paginations.limit);
-    qb.offset(paginations.offset);
+
+    if (paginations.offset) {
+      qb.offset(paginations.offset);
+    }
   }
 
   return qb.getMany();

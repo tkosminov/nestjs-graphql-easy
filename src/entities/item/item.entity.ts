@@ -25,6 +25,7 @@ export class Item {
   @Field(() => Date)
   @CreateDateColumn({
     type: 'timestamp without time zone',
+    precision: 3,
     default: () => 'CURRENT_TIMESTAMP',
   })
   public created_at: Date;
@@ -32,6 +33,7 @@ export class Item {
   @Field(() => Date)
   @UpdateDateColumn({
     type: 'timestamp without time zone',
+    precision: 3,
     default: () => 'CURRENT_TIMESTAMP',
   })
   public updated_at: Date;

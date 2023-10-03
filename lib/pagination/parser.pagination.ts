@@ -9,14 +9,19 @@ export interface IPaginationValue {
 
 export interface IParsedPagination {
   limit: number;
-  offset: number;
+  offset?: number;
 }
 
-export function parsePagination(data: IPaginationValue): IParsedPagination {
+export function parsePagination(data: IPaginationValue) {
   validateDTO(PaginationInputType, data);
 
-  return {
+  const pagination: IParsedPagination = {
     limit: data.per_page,
-    offset: data.per_page * data.page,
   };
+
+  if (data.page != null) {
+    pagination.offset = data.page * data.per_page;
+  }
+
+  return pagination;
 }

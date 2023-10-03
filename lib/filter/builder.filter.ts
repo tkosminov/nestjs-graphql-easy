@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference } from '@nestjs/graphql';
+import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference, ID } from '@nestjs/graphql';
 
 import { decorateField, where_field_input_types, where_input_types, gql_fields, gql_enums, IField } from '../store/graphql';
 
@@ -28,7 +28,7 @@ const string_operations = ['ILIKE', 'NOT_ILIKE'];
 const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 
 const string_types: GqlTypeReference[] = [String];
-const precision_types: GqlTypeReference[] = [Int, Float, Number, Date];
+const precision_types: GqlTypeReference[] = [ID, Int, Float, Number, Date];
 
 function findEnumName(col_type: GqlTypeReference) {
   let col_type_name: string = null;

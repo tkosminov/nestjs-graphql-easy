@@ -39,15 +39,18 @@ export function reduceToObject<T>(array: T[], key: string): { [K: string]: T } {
 }
 
 export function groupBy<T>(array: T[], key: string): { [key: string]: T[] } {
-  return array.reduce((acc, curr) => {
-    if (!acc.hasOwnProperty(curr[key])) {
-      acc[curr[key]] = [];
-    }
+  return array.reduce(
+    (acc, curr) => {
+      if (!acc.hasOwnProperty(curr[key])) {
+        acc[curr[key]] = [];
+      }
 
-    acc[curr[key]].push(curr);
+      acc[curr[key]].push(curr);
 
-    return acc;
-  }, {} as { [key: string]: T[] });
+      return acc;
+    },
+    {} as { [key: string]: T[] }
+  );
 }
 
 export function validateDTO(type: ClassConstructor<unknown>, value: unknown) {

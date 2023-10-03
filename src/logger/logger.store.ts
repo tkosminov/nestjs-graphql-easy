@@ -15,7 +15,10 @@ export class LoggerStore {
   private log_index = 0;
   private prev_log_time: number = Date.now();
 
-  constructor(private readonly logger: LoggerService, private readonly base_ctx: { [key: string]: unknown } = {}) {}
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly base_ctx: { [key: string]: unknown } = {}
+  ) {}
 
   public log(message: unknown, context: object = {}) {
     this.addLog(ELogLevel.debug, { message, context });

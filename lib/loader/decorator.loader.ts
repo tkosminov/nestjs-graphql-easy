@@ -72,25 +72,25 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
   const entity_table_name = underscore(entity_class_name);
   const field_alias = entity_table_name;
 
-  const filters = gargs['WHERE'];
+  const filters: IFilterValue | undefined = gargs['WHERE'];
   let parsed_filters: IParsedFilter = null;
 
   if (filters) {
-    parsed_filters = parseFilter(entity_table_name, filters as IFilterValue);
+    parsed_filters = parseFilter(entity_table_name, filters);
   }
 
-  const orders = gargs['ORDER'];
+  const orders: IOrderValue | undefined = gargs['ORDER'];
   let parsed_orders: IParsedOrder[] = null;
 
   if (orders) {
-    parsed_orders = parseOrder(entity_table_name, orders as IOrderValue);
+    parsed_orders = parseOrder(entity_table_name, orders);
   }
 
-  const paginations = gargs['PAGINATION'];
+  const paginations: IPaginationValue | undefined = gargs['PAGINATION'];
   let parsed_paginations: IParsedPagination = null;
 
   if (paginations) {
-    parsed_paginations = parsePagination(paginations as IPaginationValue);
+    parsed_paginations = parsePagination(paginations);
   }
 
   const selected_fields = recursiveSelectedFields(_data, info.fieldNodes, info.fragments);

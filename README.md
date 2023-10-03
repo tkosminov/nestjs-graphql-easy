@@ -19,6 +19,7 @@
   - [Filtering](#filtering)
   - [Ordering](#ordering)
   - [Pagination](#pagination)
+  - [Cursor pagination](#cursor-pagination)
   - [Permanent filters](#permanent-filters)
 
 ## Description
@@ -499,6 +500,123 @@ This will add arguments to the query for pagination:
 ```
 
 When working with pagination, it is important to remember [point 5 of the important section](#important).
+
+## [Cursor pagination](https://the-guild.dev/blog/graphql-cursor-pagination-with-postgresql)
+
+Pagination works in tandem with a data loader, filters, and sorting and allows you to limit the number of records received from the database
+
+```ts
+@Resolver(() => Author)
+export class AuthorResolver {
+  ...
+  @Query(() => [Author])
+  public async authors(
+    @Loader({
+      loader_type: ELoaderType.MANY, 
+      field_name: 'authors',
+      entity: () => Author,
+      entity_fk_key: 'id',
+    }) field_alias: string,
+    @Filter(() => Author) _filter: unknown, // <-- ADD
+    @Order(() => Author) _order: unknown, // <-- ADD
+    @Pagination() _pagination: unknown, // <-- ADD
+    @Context() ctx: GraphQLExecutionContext
+  ) {
+    return await ctx[field_alias];
+  }
+  ...
+}
+```
+
+Then you can get the first page using the query:
+
+```gql
+query firstPage {
+  authors(
+    ORDER: { id: { SORT: ASC } }
+    PAGINATION: { per_page: 10 }
+  ) {
+    id
+  }
+}
+```
+
+Then you can get the next page using the query:
+
+```gql
+query nextPage($ID_of_the_last_element_from_the_previous_page: ID!) {
+  authors(
+    WHERE: { id: { GT: $ID_of_the_last_element_from_the_previous_page }}
+    ORDER: { id: { SORT: ASC } }
+    PAGINATION: { per_page: 10 }
+  ) {
+    id
+  }
+}
+```
+
+Fields that are planned to be used as a cursor must be allowed for filtering and sorting in the `@Field` decorator, and it is also recommended to index them indicating the sort order.
+
+With such pagination, it is important to take into account the order in which the fields specified in the sorting are listed.
+
+You can also use several fields as cursors. The main thing is to maintain order.
+
+Then you can get the first page using the query:
+
+```gql
+query firstPage{
+  authors(
+    ORDER: { updated_at: { SORT: DESC }, id: { SORT: ASC } }
+    PAGINATION: { per_page: 10 }
+  ) {
+    id
+  }
+}
+
+```
+
+Then you can get the next page using the query:
+
+```gql
+query nextPage(
+  $UPDATED_AT_of_the_last_element_from_the_previous_page: DateTime!
+  $ID_of_the_last_element_from_the_previous_page: ID!
+) {
+  authors(
+    WHERE: {
+      updated_at: { LT: $UPDATED_AT_of_the_last_element_from_the_previous_page }
+      OR: {
+        updated_at: {
+          EQ: $UPDATED_AT_of_the_last_element_from_the_previous_page
+        }
+        id: { GT: $ID_of_the_last_element_from_the_previous_page }
+      }
+    }
+    ORDER: { updated_at: { SORT: DESC }, id: { SORT: ASC } }
+    PAGINATION: { per_page: 10 }
+  ) {
+    id
+  }
+}
+```
+
+However, it is recommended to limit the time columns to milliseconds:
+
+```ts
+@ObjectType()
+@Entity()
+export class Author {
+  ...
+  @Field(() => Date, { filterable: true, sortable: true })
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    precision: 3, // <-- ADD
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+  ...
+}
+```
 
 ## Permanent filters
 

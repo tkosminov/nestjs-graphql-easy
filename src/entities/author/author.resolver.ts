@@ -12,7 +12,10 @@ import { Author } from './author.entity';
 
 @Resolver(() => Author)
 export class AuthorResolver {
-  constructor(private readonly dataSource: DataSource, @Inject(GRAPHQL_SUBSCRIPTIONS_PUB_SUB) private readonly pubSub: PubSub) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Inject(GRAPHQL_SUBSCRIPTIONS_PUB_SUB) private readonly pubSub: PubSub
+  ) {}
 
   @Query(() => [Author])
   public async authors(
