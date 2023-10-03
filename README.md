@@ -1,5 +1,11 @@
 # NestJS-GraphQL-Easy
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/nestjs-graphql-easy" target="_blank"><img src="https://img.shields.io/npm/v/nestjs-graphql-easy.svg" alt="NPM Version"></a>
+  <a href="https://www.npmjs.com/package/nestjs-graphql-easy" target="_blank"><img src="https://img.shields.io/npm/l/nestjs-graphql-easy.svg" alt="Package License"></a>
+  <a href="https://www.npmjs.com/package/nestjs-graphql-easy" target="_blank"><img src="https://img.shields.io/npm/dm/nestjs-graphql-easy.svg" alt="NPM Downloads"></a>
+</p>
+
 ## Overview
 
 - [NestJS-GraphQL-Easy](#nestjs-graphql-easy)
