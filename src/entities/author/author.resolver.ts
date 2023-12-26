@@ -69,13 +69,13 @@ export class AuthorResolver {
 
     await this.dataSource.getRepository(Author).update(author.id, { name: author.name });
 
-    this.pubSub.publish('changeAuthorName', { changeAuthorName: author });
+    this.pubSub.publish('updateAuthorEvent', { updateAuthorEvent: author, channel_ids: [null, '1'] });
 
     return author;
   }
 
-  @Subscription(() => Author)
-  protected async changeAuthorName() {
-    return this.pubSub.asyncIterator('changeAuthorName');
+  @Subscription(() => Author, { filter: (payload, variables) => payload.channel_ids.includes(variables.channel_id) })
+  protected async updateAuthorEvent(@Args({ name: 'channel_id', type: () => ID, nullable: true }) _channel_id: string) {
+    return this.pubSub.asyncIterator('updateAuthorEvent');
   }
 }

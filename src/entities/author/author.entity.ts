@@ -1,7 +1,7 @@
 import { Extensions, ID } from '@nestjs/graphql';
 
 import { Index, OneToMany } from 'typeorm';
-
+import { DateTimeISOResolver } from 'graphql-scalars';
 import {
   ObjectType,
   Field,
@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
   PrimaryGeneratedColumn,
   registerEnumType,
+  EDataType,
 } from 'nestjs-graphql-easy';
 
 import { Book } from '../book/book.entity';
@@ -48,7 +49,11 @@ export class Author {
   })
   public created_at: Date;
 
-  @Field(() => Date, { filterable: true, sortable: true })
+  @Field(() => DateTimeISOResolver, {
+    filterable: true,
+    sortable: true,
+    allow_filters_from: [EDataType.PRECISION],
+  })
   @UpdateDateColumn({
     type: 'timestamp without time zone',
     precision: 3,
@@ -57,7 +62,11 @@ export class Author {
   public updated_at: Date;
 
   @Extensions({ role: 'ADMIN' })
-  @Field(() => String, { filterable: true, sortable: true })
+  @Field(() => String, {
+    filterable: true,
+    sortable: true,
+    allow_filters_from: [EDataType.PRECISION],
+  })
   @Column()
   @Index({ unique: true })
   public name: string;

@@ -20,9 +20,15 @@ export interface IObjectType {
   options?: ObjectTypeOptions;
 }
 
+export enum EDataType {
+  STRING = 'string',
+  PRECISION = 'precision',
+}
+
 interface IFieldOptions extends Omit<FieldOptions, 'name'> {
   filterable?: boolean;
   sortable?: boolean;
+  allow_filters_from?: EDataType[];
 }
 
 export interface IField {

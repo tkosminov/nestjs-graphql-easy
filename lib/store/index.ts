@@ -1,4 +1,4 @@
-export { Field, ObjectType, Query, Mutation, ResolveField, registerEnumType } from './graphql';
+export { Field, ObjectType, Query, Mutation, ResolveField, registerEnumType, EDataType } from './graphql';
 export {
   PolymorphicColumn,
   Column,

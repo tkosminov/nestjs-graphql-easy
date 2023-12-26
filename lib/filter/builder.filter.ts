@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { InputType, ReturnTypeFunc, Int, Float, GqlTypeReference, ID } from '@nestjs/graphql';
 
-import { decorateField, where_field_input_types, where_input_types, gql_fields, gql_enums, IField } from '../store/graphql';
+import { decorateField, where_field_input_types, where_input_types, gql_fields, gql_enums, IField, EDataType } from '../store/graphql';
 
 export enum EFilterOperator {
   AND = 'AND',
@@ -29,6 +29,7 @@ const precision_operations = ['GT', 'GTE', 'LT', 'LTE'];
 
 const string_types: GqlTypeReference[] = [String];
 const precision_types: GqlTypeReference[] = [ID, Int, Float, Number, Date];
+const other_types: GqlTypeReference[] = [Boolean];
 
 function findEnumName(col_type: GqlTypeReference) {
   let col_type_name: string = null;
@@ -83,7 +84,13 @@ const buildFilterField = (column: IField): ReturnTypeFunc => {
     }
   });
 
-  if (string_types.includes(col_type)) {
+  let allow_filters_from = column.options?.allow_filters_from;
+
+  if ((string_types.includes(col_type) || precision_types.includes(col_type) || other_types.includes(col_type)) && allow_filters_from) {
+    allow_filters_from = undefined;
+  }
+
+  if (string_types.includes(col_type) || allow_filters_from?.includes(EDataType.STRING)) {
     string_operations.forEach((operation) => {
       decorateField(field_input_type, operation, () => col_type, {
         nullable: true,
@@ -91,7 +98,7 @@ const buildFilterField = (column: IField): ReturnTypeFunc => {
     });
   }
 
-  if (precision_types.includes(col_type)) {
+  if (precision_types.includes(col_type) || allow_filters_from?.includes(EDataType.PRECISION)) {
     precision_operations.forEach((operation) => {
       decorateField(field_input_type, operation, () => col_type, {
         nullable: true,

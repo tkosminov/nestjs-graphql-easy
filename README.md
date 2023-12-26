@@ -23,6 +23,7 @@
     - [one-to-one](#one-to-one)
     - [polymorphic](#polymorphic)
   - [Filtering](#filtering)
+    - [Scalar](#scalar)
   - [Ordering](#ordering)
   - [Pagination](#pagination)
   - [Cursor pagination](#cursor-pagination)
@@ -357,7 +358,7 @@ Polymorphic query example:
 Filters work in tandem with the dataloader and make it possible to filter entities by conditions:
 
 ```ts
-export enum EFilterOperation {
+enum EFilterOperation {
   EQ = '=',
   NOT_EQ = '!=',
   NULL = 'IS NULL',
@@ -372,6 +373,21 @@ export enum EFilterOperation {
   LTE = '<=',
 }
 ```
+
+Depending on the type of field to be used in the filter, the following operations apply:
+
+* basic (all types) operations:
+  ```ts
+  ['EQ', 'NOT_EQ', 'NULL', 'NOT_NULL', 'IN', 'NOT_IN']
+  ```
+* string (String) operations:
+  ```ts
+  ['ILIKE', 'NOT_ILIKE']
+  ```
+* precision (Number, Int, Float, Date, ID) operations:
+  ```ts
+  ['GT', 'GTE', 'LT', 'LTE']
+  ```
 
 Filters are generated based on the information specified in the `@Field` provided in the model:
 
@@ -419,6 +435,34 @@ This will add arguments to the query for filtering:
 ```
 
 When working with filters, it is important to remember [point 4 of the important section](#important).
+
+### Scalar
+
+If the field type is a scalar, then by default only basic filtering operations can be used for such a field.
+
+If you need to add the use of other operations, you can specify this:
+
+```ts
+import { DateTimeISOResolver } from 'graphql-scalars';
+
+@ObjectType()
+@Entity()
+export class Author {
+  @Field(() => DateTimeISOResolver, {
+    filterable: true,
+    allow_filters_from: [EDataType.PRECISION],
+  })
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    precision: 3,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  public updated_at: Date;
+  ...
+}
+```
+
+If the field type is not a scalar, then this option will be ignored.
 
 ## Ordering
 
