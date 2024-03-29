@@ -7,7 +7,7 @@ import { DataSource, EntityManager } from 'typeorm';
 import { underscore } from '../helper';
 
 import { IFilterValue, IParsedFilter, parseFilter } from '../filter/parser.filter';
-import { IOrderValue, IParsedOrder, parseOrder } from '../order/parser.order';
+import { TOrderValue, IParsedOrder, parseOrder } from '../order/parser.order';
 import { IPaginationValue, IParsedPagination, parsePagination } from '../pagination/parser.pagination';
 import { getTableColumns, getTableForeignKeys, getTablePrimaryKeys } from '../store';
 import { invalid_data_source } from '../error';
@@ -79,7 +79,7 @@ export const Loader = createParamDecorator((data: ILoaderData, ctx: ExecutionCon
     parsed_filters = parseFilter(entity_table_name, filters);
   }
 
-  const orders: IOrderValue | undefined = gargs['ORDER'];
+  const orders: TOrderValue | undefined = gargs['ORDER'];
   let parsed_orders: IParsedOrder[] = null;
 
   if (orders) {

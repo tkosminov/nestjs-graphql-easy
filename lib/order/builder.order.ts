@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { InputType, ReturnTypeFunc } from '@nestjs/graphql';
+import { InputType, Int, ReturnTypeFunc } from '@nestjs/graphql';
 
 import { decorateField, order_field_input_types, order_input_types, gql_fields, IField, registerEnumType } from '../store/graphql';
 
 export enum EOrderQuery {
   SORT = 'SORT',
   NULLS = 'NULLS',
+  PRIORITY = 'PRIORITY',
 }
 
 export enum EOrderMethod {
@@ -40,6 +41,10 @@ const buildOrderField = (_column: IField): ReturnTypeFunc => {
   });
 
   decorateField(field_input_type, EOrderQuery.NULLS, () => EOrderNulls, {
+    nullable: true,
+  });
+
+  decorateField(field_input_type, EOrderQuery.PRIORITY, () => Int, {
     nullable: true,
   });
 
