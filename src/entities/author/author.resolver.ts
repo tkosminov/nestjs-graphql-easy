@@ -76,6 +76,6 @@ export class AuthorResolver {
 
   @Subscription(() => Author, { filter: (payload, variables) => payload.channel_ids.includes(variables.channel_id) })
   protected async updateAuthorEvent(@Args({ name: 'channel_id', type: () => ID, nullable: true }) _channel_id: string) {
-    return this.pubSub.asyncIterator('updateAuthorEvent');
+    return this.pubSub.asyncIterableIterator('updateAuthorEvent');
   }
 }

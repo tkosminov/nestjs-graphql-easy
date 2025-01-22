@@ -137,7 +137,7 @@ export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOption
       options,
     });
 
-    return GqlField(returnTypeFunction, options)(prototype, property_key);
+    return GqlField(returnTypeFunction, options as FieldOptions)(prototype, property_key);
   };
 }
 
@@ -170,7 +170,7 @@ export function Query(returnTypeFunction: ReturnTypeFunc, options?: Omit<QueryOp
       });
     }
 
-    return GqlQuery(returnTypeFunction, options)(prototype, property_key, descriptor);
+    return GqlQuery(returnTypeFunction, options as QueryOptions)(prototype, property_key, descriptor);
   };
 }
 
@@ -185,7 +185,7 @@ export function Mutation(returnTypeFunction: ReturnTypeFunc, options?: Omit<Muta
       });
     }
 
-    return GqlMutation(returnTypeFunction, options)(prototype, property_key, descriptor);
+    return GqlMutation(returnTypeFunction, options as MutationOptions)(prototype, property_key, descriptor);
   };
 }
 
@@ -200,7 +200,7 @@ export function ResolveField(returnTypeFunction: ReturnTypeFunc, options?: Omit<
       });
     }
 
-    return GqlResolveField(returnTypeFunction, options)(prototype, property_key, descriptor);
+    return GqlResolveField(returnTypeFunction, options as ResolveFieldOptions)(prototype, property_key, descriptor);
   };
 }
 
