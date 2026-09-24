@@ -32,7 +32,7 @@
     "n+1"
   ],
   "repository": {
-    "url": "https://github.com/tkosminov/nestjs-graphql-easy"
+    "url": "git+https://github.com/tkosminov/nestjs-graphql-easy.git"
   },
   "scripts": {
     "build": "nest build -p ./tsconfig.build.json",
