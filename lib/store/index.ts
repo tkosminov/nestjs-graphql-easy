@@ -1,4 +1,4 @@
-export { Field, ObjectType, Query, Mutation, ResolveField, registerEnumType, EDataType } from './graphql';
+export { Field, ObjectType, Query, Mutation, ResolveField, registerEnumType, EDataType } from './graphql.js';
 export {
   PolymorphicColumn,
   Column,
@@ -10,4 +10,4 @@ export {
   getTableColumns,
   getTableForeignKeys,
   getTablePrimaryKeys,
-} from './typeorm';
+} from './typeorm.js';

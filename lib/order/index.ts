@@ -1,2 +1,1 @@
-export { Order } from './decorator.order';
-export { parseOrder } from './parser.order';
+export { Order } from './decorator.js';

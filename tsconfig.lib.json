@@ -1,35 +1,9 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "declaration": true,
-    "removeComments": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "ES2019",
-    "sourceMap": true,
+    "rootDir": "./lib",
     "outDir": "./dist-lib",
-    "baseUrl": "lib",
-    "typeRoots": [
-      "node_modules/@types",
-      "types"
-    ],
-    "paths": {
-      "@gql": ["./lib/index"]
-    }
   },
-  "exclude": [
-    ".git",
-    ".vscode",
-    "config",
-    "dist",
-    "dist-lib",
-    "node_modules",
-    "src"
-  ]
+  "include": ["lib"],
+  "exclude": ["node_modules", "dist", "dist-lib", "**/*spec.ts"]
 }

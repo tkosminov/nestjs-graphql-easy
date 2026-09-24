@@ -1,35 +1,25 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "declaration": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ES2023",
+    "sourceMap": true,
+    "incremental": false,
     "removeComments": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "importHelpers": true,
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "ESNext",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
-    "paths": {
-      "@helpers/*": ["./src/helpers/*"],
-      "@errors": ["./src/errors/index"],
-      "nestjs-graphql-easy": ["./lib/index"]
-    }
-  },
-  "exclude": [
-    ".git",
-    ".vscode",
-    "dist",
-    "dist-lib",
-    "node_modules"
-  ]
+    "ignoreDeprecations": "6.0",
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "types": ["vitest/globals", "node"],
+    "baseUrl": "./"
+  }
 }

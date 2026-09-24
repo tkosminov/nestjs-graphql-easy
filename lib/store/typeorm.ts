@@ -10,25 +10,25 @@ import {
   PrimaryColumnOptions,
   PrimaryGeneratedColumn as OrmPrimaryGeneratedColumn,
 } from 'typeorm';
-import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions';
-import { ColumnEmbeddedOptions } from 'typeorm/decorator/options/ColumnEmbeddedOptions';
-import { ColumnEnumOptions } from 'typeorm/decorator/options/ColumnEnumOptions';
-import { ColumnHstoreOptions } from 'typeorm/decorator/options/ColumnHstoreOptions';
-import { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOptions';
-import { ColumnWithLengthOptions } from 'typeorm/decorator/options/ColumnWithLengthOptions';
-import { ColumnWithWidthOptions } from 'typeorm/decorator/options/ColumnWithWidthOptions';
-import { PrimaryGeneratedColumnIdentityOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnIdentityOptions';
-import { PrimaryGeneratedColumnNumericOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnNumericOptions';
-import { PrimaryGeneratedColumnUUIDOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnUUIDOptions';
-import { SpatialColumnOptions } from 'typeorm/decorator/options/SpatialColumnOptions';
+import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions.js';
+import { ColumnEmbeddedOptions } from 'typeorm/decorator/options/ColumnEmbeddedOptions.js';
+import { ColumnEnumOptions } from 'typeorm/decorator/options/ColumnEnumOptions.js';
+import { ColumnHstoreOptions } from 'typeorm/decorator/options/ColumnHstoreOptions.js';
+import { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOptions.js';
+import { ColumnWithLengthOptions } from 'typeorm/decorator/options/ColumnWithLengthOptions.js';
+import { ColumnUnsignedOptions } from 'typeorm/decorator/options/ColumnUnsignedOptions.js';
+import { PrimaryGeneratedColumnIdentityOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnIdentityOptions.js';
+import { PrimaryGeneratedColumnNumericOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnNumericOptions.js';
+import { PrimaryGeneratedColumnUUIDOptions } from 'typeorm/decorator/options/PrimaryGeneratedColumnUUIDOptions.js';
+import { SpatialColumnOptions } from 'typeorm/decorator/options/SpatialColumnOptions.js';
 import {
   ColumnType,
   SimpleColumnType,
   SpatialColumnType,
   WithLengthColumnType,
   WithPrecisionColumnType,
-  WithWidthColumnType,
-} from 'typeorm/driver/types/ColumnTypes';
+  UnsignedColumnType,
+} from 'typeorm/driver/types/ColumnTypes.js';
 
 /**
  * Map<entity_class_name, Set<entity_column_name>>
@@ -47,7 +47,7 @@ export const table_primary_keys: Map<string, Set<string>> = new Map();
 
 export function getTableColumns(entity_class_name: string) {
   if (table_columns.has(entity_class_name)) {
-    return table_columns.get(entity_class_name);
+    return table_columns.get(entity_class_name)!;
   }
 
   const typeormArgs = getMetadataArgsStorage();
@@ -59,15 +59,15 @@ export function getTableColumns(entity_class_name: string) {
 
     const columns = table_columns.get(col.target['name']);
 
-    columns.add(col.propertyName);
+    columns!.add(col.propertyName);
   });
 
-  return table_columns.get(entity_class_name) || new Set();
+  return table_columns.get(entity_class_name) ?? new Set();
 }
 
 export function getTableForeignKeys(entity_class_name: string) {
   if (table_foreign_keys.has(entity_class_name)) {
-    return table_foreign_keys.get(entity_class_name);
+    return table_foreign_keys.get(entity_class_name)!;
   }
 
   const typeormArgs = getMetadataArgsStorage();
@@ -79,15 +79,17 @@ export function getTableForeignKeys(entity_class_name: string) {
 
     const fks = table_foreign_keys.get(col.target['name']);
 
-    fks.add(col.name);
+    if (col.name) {
+      fks!.add(col.name);
+    }
   });
 
-  return table_foreign_keys.get(entity_class_name) || new Set();
+  return table_foreign_keys.get(entity_class_name) ?? new Set();
 }
 
 export function getTablePrimaryKeys(entity_class_name: string) {
   if (table_primary_keys.has(entity_class_name)) {
-    return table_primary_keys.get(entity_class_name);
+    return table_primary_keys.get(entity_class_name)!;
   }
 
   const typeormArgs = getMetadataArgsStorage();
@@ -100,11 +102,11 @@ export function getTablePrimaryKeys(entity_class_name: string) {
 
       const fks = table_primary_keys.get(col.target['name']);
 
-      fks.add(col.propertyName);
+      fks!.add(col.propertyName);
     }
   });
 
-  return table_primary_keys.get(entity_class_name) || new Set();
+  return table_primary_keys.get(entity_class_name) ?? new Set();
 }
 
 export function PolymorphicColumn(): PropertyDecorator {
@@ -113,7 +115,11 @@ export function PolymorphicColumn(): PropertyDecorator {
       table_foreign_keys.set(prototype['constructor']['name'], new Set([]));
     }
 
-    table_foreign_keys.get(prototype['constructor']['name']).add(property_key);
+    const fks = table_foreign_keys.get(prototype['constructor']['name']);
+
+    if (fks && typeof property_key === 'string') {
+      fks.add(property_key);
+    }
   };
 }
 
@@ -169,7 +175,7 @@ export function Column(
   type?: WithLengthColumnType,
   options?: Omit<ColumnCommonOptions & ColumnWithLengthOptions, 'name'>
 ): PropertyDecorator;
-export function Column(type?: WithWidthColumnType, options?: Omit<ColumnCommonOptions & ColumnWithWidthOptions, 'name'>): PropertyDecorator;
+export function Column(type?: UnsignedColumnType, options?: Omit<ColumnCommonOptions & ColumnUnsignedOptions, 'name'>): PropertyDecorator;
 export function Column(
   type?: WithPrecisionColumnType,
   options?: Omit<ColumnCommonOptions & ColumnNumericOptions, 'name'>

@@ -1,19 +1,12 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
-import { DatabaseModule } from './database/database.module';
-import { EntitiesModule } from './entities/entities.module';
-import { GraphQLModule } from './graphql/graphql.module';
-import { HealthzModule } from './healthz/healthz.module';
-import { LoggerModule } from './logger/logger.module';
-import { LoggerMiddleware } from './logger/logger.middleware';
+import { ConfigModule } from './config/config.module.js';
+import { TypeOrmModule } from './typeorm/typeorm.module.js';
+import { GraphQLModule } from './graphql/graphql.module.js';
+import { GraphQLPubSubModule } from './graphql/graphql.pubsub.js';
+import { ModelsModule } from './models/models.module.js';
 
 @Module({
-  imports: [LoggerModule, HealthzModule, DatabaseModule, GraphQLModule, EntitiesModule],
-  controllers: [],
-  providers: [],
+  imports: [ConfigModule.forRoot(`${process.cwd()}/config`), TypeOrmModule.forRoot(), GraphQLModule, GraphQLPubSubModule, ModelsModule],
 })
-export class AppModule {
-  public configure(consumer: MiddlewareConsumer): void | MiddlewareConsumer {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

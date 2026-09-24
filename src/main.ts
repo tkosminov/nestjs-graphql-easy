@@ -1,42 +1,16 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
 
-import config from 'config';
-import cookieParser from 'cookie-parser';
-import express from 'express';
+import bodyParser from 'body-parser';
 import helmet from 'helmet';
-import { json, urlencoded } from 'body-parser';
-import { DataSourceOptions } from 'typeorm';
-import { createDatabase } from 'typeorm-extension';
 
-import { AppModule } from './app.module';
-import { corsOptionsDelegate } from './cors.options';
-import { getOrmConfig } from './database/database-ormconfig.constant';
-
-const appSettings = config.get<IAppSettings>('APP_SETTINGS');
+import { AppModule } from './app.module.js';
+import { ConfigService } from './config/config.service.js';
 
 async function bootstrap() {
-  const server = express();
+  const app = await NestFactory.create(AppModule);
 
-  await createDatabase({
-    ifNotExist: true,
-    options: getOrmConfig() as DataSourceOptions,
-  });
-
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
-    bodyParser: true,
-  });
-
-  app.use(json({ limit: appSettings.bodyLimit }));
-
-  app.use(
-    urlencoded({
-      extended: true,
-      limit: appSettings.bodyLimit,
-      parameterLimit: appSettings.bodyParameterLimit,
-    })
-  );
+  const config = app.get(ConfigService);
 
   app.use(
     helmet({
@@ -45,9 +19,14 @@ async function bootstrap() {
     })
   );
 
-  app.use(cookieParser());
-
-  app.enableCors(corsOptionsDelegate);
+  app.use(bodyParser.json({ limit: config.get('APP_BODY_LIMIT') }));
+  app.use(
+    bodyParser.urlencoded({
+      limit: config.get('APP_BODY_LIMIT'),
+      extended: true,
+      parameterLimit: config.get('APP_BODY_PARAMETER_LIMIT'),
+    })
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -55,7 +34,9 @@ async function bootstrap() {
     })
   );
 
-  await app.listen(appSettings.port);
+  await app.listen(config.get('APP_PORT')).then(() => {
+    console.log(`${config.get('APP_NAME')} listening on http://localhost:${config.get('APP_PORT')}`);
+  });
 }
 
-bootstrap();
+await bootstrap();

@@ -48,7 +48,7 @@ With this library you will be able to easily create complex queries
     gender
     books(
       WHERE: { is_private: { EQ: false } }
-      ORDER: { created_at: { SORT: DESC } }
+      ORDER: { created_at: { SORT: DESC, PRIORITY: 0 }, id: { SORT: ASC, PRIORITY: 1 } }
     ) {
       id
       author_id
@@ -68,8 +68,18 @@ npm i nestjs-graphql-easy
 ## Note
 
 **This library requires**:
-* NestJS 9 or higher version
-* TypeORM 0.3 or higher version
+* `^1.0.0`
+  * NestJS: `^8.0.0`
+  * TypeORM: `^0.2.0`
+* `^2.0.0`
+  * NestJS: `^8.0.0`
+  * TypeORM: `^0.3.0`
+* `^3.0.0`
+  * NestJS: `^9.0.0` || `^10.0.0` || `^11.0.0`
+  * TypeORM: `^0.3.0`
+* `^4.0.0`
+  * NestJS: `^12.0.0`
+  * TypeORM: `^1.0.0`
 
 **A fully working example with all the functionality is located in the `src` folder**
 
@@ -101,9 +111,7 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { GraphqlOptions } from './graphql.options';
 
 export default GraphQLModule.forRootAsync({
-  imports: [],
   useClass: GraphqlOptions, // <-- ADD
-  inject: [],
   driver: ApolloDriver,
 });
 ```

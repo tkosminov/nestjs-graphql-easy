@@ -1,1 +1,1 @@
-export { Loader, ELoaderType, ILoaderData, setDataSource } from './decorator.loader';
+export { setDataSource, ELoaderType, Loader, type TGraphQLExecutionContext } from './decorator.js';

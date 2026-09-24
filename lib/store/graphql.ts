@@ -130,7 +130,7 @@ export function Field(returnTypeFunction: ReturnTypeFunc, options?: IFieldOption
 
     const fields = gql_fields.get(prototype['constructor']['name']);
 
-    fields.add({
+    fields!.add({
       entity_class_name: prototype['name'],
       name: property_key,
       type_function: returnTypeFunction,
